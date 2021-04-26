@@ -1,0 +1,36 @@
+Package: chkMocks
+Type: Package
+Title: Compare Mock Community Samples in Microbiome Sequencing Studies
+Version: 0.1.0
+Authors@R: 
+    c(person(given = "Sudarshan", family = "Shetty", role = c("aut", "cre"),
+             email = "sudarshanshetty9@gmail.com",
+             comment = c(ORCID = "0000-0001-7280-9915")),
+      person(given = "Person", family = "Person", role = c("aut")),
+      person(given = "Person", family = "Person", role = c("aut"),
+             email = "Person@rivm.nl")
+	     )
+Maintainer: Sudarshan Shetty <sudarshanshetty9@gmail.com>
+Description: chkMocks is a basic R package for comparing experimental ZymoBiomics samples with theoretical composition. Default composition is for Product name D6300.Not tested with custom mocks.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends: 
+    R (>= 4.0.0)
+Imports: 
+    Biostrings,
+    corrr,
+    dada2,
+    dplyr,
+    ggplot2,
+    microbiome,
+    phyloseq,
+    tibble
+Suggests: 
+    testthat,
+    patchwork,
+    remotes,
+    knitr,
+    rmarkdown
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr

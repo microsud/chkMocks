@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data-raw/*.R
+data-raw/*.pdf
+data-raw/*.rds
+# Never put this in version control
+OAtoken
+*.rds
+inst/doc

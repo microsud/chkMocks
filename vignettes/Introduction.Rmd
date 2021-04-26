@@ -1,0 +1,202 @@
+---
+title: "Introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Every microbiome sequencing experiment must have a positive control. However, how do we make use of these mock controls to guide our quality check is not easily available. A basic question to asks, _Is the composition in experimental mock standards similar to theoretical expected composition?_    
+We can visually compare the composition bar-plots and check for correlation between experimental and theoretical community composition.  
+`chkMocks` eases these basic comparison.  
+
+
+```{r setup}
+library(chkMocks)
+library(dplyr)
+```
+
+Before starting the analysis you need:  
+
+* A phyloseq object with mock community composition   
+* Phyloseq object should have a `refseq` slot with ASV sequences or `taxa_names` must be ASV seqs    
+* If you do not have ZymoBiomics, then a custom database, a fasta file will all seqs from genomes.    
+
+```{r}
+library(phyloseq)
+ps.zym <- ZymoExamplePseq
+taxa_names(ps.zym) <- refseq(ps.zym)
+```
+
+
+```{r}
+output.dat <- checkZymoBiomics(ps.zym,
+                               mock_db = NULL,
+                               multithread= 2,
+                               minBoot = 80)
+```
+
+```{r}
+pseq.all <- output.dat$pseq
+
+pseq.all
+```
+
+```{r fig.height=5, fig.width=8}
+library(patchwork)
+library(ggplot2)
+p1 <- output.dat$compBarplot +
+  ylab("Abundance (%)")
+#+ coord_polar() + ylim(-10,100)
+p2 <- output.dat$corBarplot + 
+  ylab("Pearson's Correlation \nwith Theoretical") +
+  xlab("Sample") + geom_hline(yintercept = 1, lty=2)
+
+p1 + p2 + plot_layout(guides = "collect")
+
+```
+
+## Custom database  
+Creating a custom database of mock community.  
+
+Create a fasta file with all known copies of 16S rRNA gene for microbes in your mock community. Which should look below.
+This format is compatible with `dada2::assignTaxonomy`. Store this database of 16S rRNA gene fasta files locally. Let's say `mymocks.fasta`
+In the example below: 2 copies of `Bacillus.subtilis`, 2 copies of `Escherichia.coli` and 1 copy of `Enterococcus.faecalis` are shown as example. 
+```{r eval=FALSE}
+>Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus;Bacillus.subtilis;
+TTTATCGGAGA..............TAAGGA
+>Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus;Bacillus.subtilis;
+TTTATCGGAGAGTTTGATCC.......TAAGGA
+>Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Enterobacteriaceae;Escherichia;Escherichia.coli;
+TTTATCGGAGA..............TAAGGA
+>Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Enterobacteriaceae;Escherichia;Escherichia.coli;
+TTTATCGGAGAGTTTGATCC.......TAAGGA
+>Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacterales;Enterobacteriaceae;Escherichia;Escherichia.coli;
+TTTATCGGAGA..............TAAGGA
+>Bacteria;Firmicutes;Bacilli;Lactobacillales;Enterococcaceae;Enterococcus;Enterococcus.faecalis;
+TTTATCGGAGAGTTTGATCC.......TAAGGA
+```
+
+## Theoretical phyloseq  
+Create a phyloseq with theoretical expected community composition
+
+```{r}
+
+
+mck.otu <- data.frame(row.names = c("Bacillus.subtilis","Enterococcus.faecalis",
+                                    "Escherichia.coli"),
+                      MyMockTheoretical=c(12, 12, 1)) %>% as.matrix() %>%
+  otu_table(taxa_are_rows=T)
+
+# expected composition in percent (%)
+MockTheoreticalComposition <- c(12, 12, 1)
+
+
+# SampleType here is label that should match one of your columns in sample_data in experimental samples phyloseq object.
+mck.sam <- data.frame(row.names = "MyMockTheoretical",
+                      SampleType = "MyMockTheoretical") %>%  
+  sample_data()
+
+mck.tax <- data.frame(row.names = c("Bacillus.subtilis","Enterococcus.faecalis",
+                                    "Escherichia.coli"),
+                      Kingdom = c("Bacteria","Bacteria","Bacteria"),
+                      Phylum = c("Firmicutes","Firmicutes","Firmicutes"),
+                      Class = c("Bacilli","Bacilli","Gammaproteobacteria"),
+                      Order = c("Bacillales","Lactobacillales","Enterobacterales"),
+                      Family = c("Bacillaceae","Enterococcaceae",
+                                 "Enterobacteriaceae"),
+                      Genus = c("Bacillus","Enterococcus",
+                                "Escherichia"),
+                      Species = c("Bacillus.subtilis","Enterococcus.faecalis",
+                                  "Escherichia.coli")) %>%
+  as.matrix()
+
+mck.theoretical <- phyloseq(mck.otu, mck.sam, tax_table(mck.tax))
+```
+
+## Process raw sequence data    
+Process the raw data with your preferred `dada2` workflow to get a `phyloseq` object. 
+```{r eval=FALSE}
+#Steps used in dada2
+library(dada2)
+filtFs <- dada2::filterAndTrim()
+filtRs <- dada2::filterAndTrim()
+errF <- dada2::learnErrors()
+errR <- dada2::learnErrors()
+#depending on which workflow you use, e.g. bid data tutorial etc. 
+dadaFs <- dada2::dada(filtFs, err=errF, multithread=TRUE)
+dadaRs <- dada2::dada(filtRs, err=errR, multithread=TRUE)
+mergers <- dada2::mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+seqtab <- dada2::makeSequenceTable(mergers)
+seqtab.nochim <- dada2::removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+# do this for all your samples but it will not be used for analysis in chkMocks
+taxa <- assignTaxonomy(seqtab.nochim, "~/tax/silva_nr_v132_train_set.fa.gz", multithread=TRUE) # path to change
+taxa <- addSpecies(taxa, "~/tax/silva_species_assignment_v132.fa.gz") # path to change
+```
+
+## Create phyloseq  
+```{r eval=FALSE}
+
+# Make taxa as rows 
+seqtab.nochim.taxa.rows <- t(seqtab.nochim)
+
+samdf <- mysampledata
+
+ps <- phyloseq(otu_table(seqtab.nochim.taxa.rows, taxa_are_rows=TRUE), 
+               sample_data(samdf), 
+               tax_table(taxa))
+# Add ASV seqs to refseq
+dna <- Biostrings::DNAStringSet(taxa_names(ps))
+names(dna) <- taxa_names(ps)
+ps <- merge_phyloseq(ps, dna)
+# Subset to keep only mock samples below is just an example.
+ps.mck <- subset_samples(ps, SampleType=="Zymo.Mock")
+
+```
+
+
+## Assign mock taxonomy  
+
+```{r eval=FALSE}
+ps.mck.nw.tax <- assignTaxonomyCustomMock(ps.mck,
+                                          mock_db = "path/to/your/formated/taxonomy/database",
+                                          multithread=2,
+                                          minBoot = 80)
+```
+
+
+## Process raw sequence data    
+
+```{r eval=FALSE}
+
+# merge with theoretical
+# There is one sampe here
+phyloseq::sample_data(mck.theoretical)$MockType <- "Theoretical"
+
+# adding new column to ps.mck.nw.tax may be for other comparisons user might be interested in doing.
+phyloseq::sample_data(ps.mck.nw.tax)$MockType <- "Experimental"
+
+ps.mck.all <- phyloseq::merge_phyloseq(mck.theoretical, ps.mck.nw.tax)
+
+```
+
+## Process raw sequence data    
+
+```{r eval=FALSE}
+
+cor.table.ref <-compare2theorectical(ps.mock.all, theoretical = NULL) 
+
+cor.table.ref
+
+```
+
+
+
