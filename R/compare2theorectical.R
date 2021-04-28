@@ -34,8 +34,8 @@ compare2theorectical <- function(x, theoretical_id){
     message(paste0("Check that theoretical = ", theoretical_id, " exists in sample_names(x)"))
     message("returning all pairwise comparisons")
     tex_cor <- suppressMessages(corrr::correlate(otu.tb,
-                                                 method = "pearson",
-                                                 use = 'pairwise.complete.obs'))
+                                                 method = "spearman",
+                                                 use = 'everything'))
     return(tex_cor)
 
   } else {
