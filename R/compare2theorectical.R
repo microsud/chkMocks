@@ -6,15 +6,17 @@
 #' @param x Phyloseq object with experimental and theoretical composition
 #' @param theoretical_id name of the theoretical sample. Must be in sample_names(x)
 #'
-#' @example
-#'
-#' #output.dat <- compare2theorectical(ps.zym,theoretical_id = "somename")
+#' @examples
+#' library(phyloseq)
+#' ps.zym <- ZymoExamplePseq
+#' taxa_names(ps.zym) <- refseq(ps.zym)
+#' compare2theorectical(ps.zym, theoretical_id = "somename")
 #'
 #' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
 #'
 #' @return Correlation table
 #'
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% all_of
 #' @importFrom tibble as_tibble
 #' @importFrom phyloseq otu_table sample_names
 #' @importFrom corrr correlate focus
@@ -45,7 +47,7 @@ compare2theorectical <- function(x, theoretical_id){
     tex_cor <- suppressMessages(corrr::correlate(otu.tb,
                                                  method = "pearson",
                                                  use = 'pairwise.complete.obs')) %>%
-      corrr::focus(all_of(theoretical_id))
+      corrr::focus(dplyr::all_of(theoretical_id))
     return(tex_cor)
   }
 

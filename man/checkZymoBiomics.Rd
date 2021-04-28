@@ -18,14 +18,13 @@ checkZymoBiomics(x, mock_db = NULL, multithread = 2, minBoot = 80, ...)
 \item{...}{Arguments to pass on to dada2::assignTaxonomy}
 }
 \value{
-List with pseq, plots and cor table
+List with pseq, and cor table
 }
 \description{
 Compare ZymoBiomics to Experimental
 }
 \details{
-A wrapper to build phylogenetic tree for ASV sequences
-         obtained after \code{dada2}.
+Compare ZymoBiomics theoretical to Experimental composition.
 }
 \examples{
 library(phyloseq)

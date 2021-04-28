@@ -53,14 +53,8 @@ pseq.all
 ```{r fig.height=5, fig.width=8}
 library(patchwork)
 library(ggplot2)
-p1 <- output.dat$compBarplot +
-  ylab("Abundance (%)")
-#+ coord_polar() + ylim(-10,100)
-p2 <- output.dat$corBarplot + 
-  ylab("Pearson's Correlation \nwith Theoretical") +
-  xlab("Sample") + geom_hline(yintercept = 1, lty=2)
 
-p1 + p2 + plot_layout(guides = "collect")
+plotZymoDefault(output.dat)
 
 ```
 
@@ -173,7 +167,7 @@ ps.mck.nw.tax <- assignTaxonomyCustomMock(ps.mck,
 ```
 
 
-## Process raw sequence data    
+## Merge theoretical and experimental      
 
 ```{r eval=FALSE}
 
@@ -188,7 +182,7 @@ ps.mck.all <- phyloseq::merge_phyloseq(mck.theoretical, ps.mck.nw.tax)
 
 ```
 
-## Process raw sequence data    
+## Check correlation 
 
 ```{r eval=FALSE}
 
@@ -199,4 +193,7 @@ cor.table.ref
 ```
 
 
+```{r}
+devtools::session_info()
+```
 

@@ -20,6 +20,13 @@ Compare Custom Mocks to Experimental
 \details{
 Correlation between theoretical and experimental mocks.
 }
+\examples{
+library(phyloseq)
+ps.zym <- ZymoExamplePseq
+taxa_names(ps.zym) <- refseq(ps.zym)
+compare2theorectical(ps.zym, theoretical_id = "somename")
+
+}
 \author{
 Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
 }

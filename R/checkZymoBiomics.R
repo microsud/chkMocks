@@ -2,8 +2,7 @@
 #'
 #' @name checkZymoBiomics
 #'
-#' @details A wrapper to build phylogenetic tree for ASV sequences
-#'          obtained after \code{dada2}.
+#' @details Compare ZymoBiomics theoretical to Experimental composition.
 #'
 #' @param x Phyloseq objects where taxa_names are ASV sequences
 #'
@@ -25,7 +24,7 @@
 #'                                minBoot = 80)
 #' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
 #'
-#' @return List with pseq, plots and cor table
+#' @return List with pseq, and cor table
 #'
 #' @importFrom dplyr %>%
 #' @importFrom tibble as_tibble
@@ -61,26 +60,8 @@ checkZymoBiomics <- function(x,
     tibble::add_row(sample.chkmks= "ZymoTheoretical", ZymoTheoretical = 1) %>%
     dplyr::mutate(row.sample = stats::reorder(sample.chkmks, ZymoTheoretical))
 
-  p <- microbiome::plot_composition(zm.all.ps) +
-    ggplot2::scale_fill_brewer(palette = "Paired") +
-    ggplot2::theme_bw() +
-    #ggplot2::facet_grid(~ZymoType) +
-    #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90)) +
-    ggplot2::scale_x_discrete(limits = c(tex_cor$sample.chkmks, "ZymoTheoretical")) +
-    ggplot2::coord_flip()
-
-  p.ht <- ggplot2::ggplot(tex_cor,
-                          ggplot2::aes(row.sample, ZymoTheoretical)) +
-    ggplot2::geom_col() +
-    ggplot2::scale_x_discrete(limits = c(tex_cor$sample.chkmks)) +
-    ggplot2::theme_bw() +
-    ggplot2::coord_flip()
-
-
   return(list("pseq"=zm.all.ps,
-              corrTable = tex_cor,
-              "compBarplot"= p,
-              "corBarplot" = p.ht))
+              "corrTable" = tex_cor))
 
 }
 
@@ -155,8 +136,8 @@ checkZymoBiomics <- function(x,
     tibble::as_tibble()
 
   tex_cor <- suppressMessages(corrr::correlate(otu.tb,
-                       method = "pearson",
-                       use = 'pairwise.complete.obs')) %>%
+                       method = "spearman",
+                       use = 'everything')) %>%
     corrr::focus(ZymoTheoretical) %>%
     dplyr::rename(sample.chkmks="term")
 
