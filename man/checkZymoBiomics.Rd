@@ -4,18 +4,30 @@
 \alias{checkZymoBiomics}
 \title{Compare ZymoBiomics to Experimental}
 \usage{
-checkZymoBiomics(x, mock_db = NULL, multithread = 2, minBoot = 80, ...)
+checkZymoBiomics(
+  x,
+  mock_db = NULL,
+  multithread = 2,
+  threshold = 60,
+  verbose = FALSE,
+  strand = "top",
+  ...
+)
 }
 \arguments{
 \item{x}{Phyloseq objects where taxa_names are ASV sequences}
 
-\item{mock_db}{Default is NULL and uses ZymoBiomics sequences}
+\item{mock_db}{ZymoTrainingSet}
 
-\item{multithread}{Passed on to dada2::assignTaxonomy Default is 2}
+\item{multithread}{Passed on to DECIPHER::IdTaxa Default is NULL}
 
-\item{minBoot}{Passed on to dada2::assignTaxonomy. Default is 80}
+\item{threshold}{Passed on to DECIPHER::IdTaxa. Default is 60}
 
-\item{...}{Arguments to pass on to dada2::assignTaxonomy}
+\item{verbose}{Default is FALSE}
+
+\item{strand}{DECIPHER::IdTaxa Default is top}
+
+\item{...}{Arguments to pass on to DECIPHER::IdTaxa}
 }
 \value{
 List with pseq, and cor table
@@ -28,12 +40,14 @@ Compare ZymoBiomics theoretical to Experimental composition.
 }
 \examples{
 library(phyloseq)
-ps.zym <- ZymoExamplePseq
-taxa_names(ps.zym) <- refseq(ps.zym)
-output.dat <- checkZymoBiomics(ps.zym,
-                               mock_db = NULL,
+
+output.dat <- checkZymoBiomics(ZymoExamplePseq,
+                               mock_db = ZymoTrainingSet,
                                multithread= 2,
-                               minBoot = 80)
+                               threshold = 80,
+                               strand = "top",
+                               verbose = FALSE)
+
 }
 \author{
 Sudarshan Shetty \email{sudarshanshetty9@gmail.com}

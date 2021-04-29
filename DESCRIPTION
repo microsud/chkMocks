@@ -17,13 +17,14 @@ Depends:
     R (>= 3.6.0)
 Imports: 
     Biostrings,
-    patchwork,
     corrr,
     dada2,
+    DECIPHER,
     dplyr,
     ggplot2,
     microbiome,
     phyloseq,
+    patchwork,
     tibble,
     tidyr
 Suggests: 

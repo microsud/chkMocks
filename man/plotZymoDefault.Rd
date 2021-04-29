@@ -20,12 +20,12 @@ A wrapper to plot the output of \code{checkZymoBiomics}.
 }
 \examples{
 library(phyloseq)
-ps.zym <- ZymoExamplePseq
-taxa_names(ps.zym) <- refseq(ps.zym)
-output.dat <- checkZymoBiomics(ps.zym,
-                               mock_db = NULL,
+output.dat <- checkZymoBiomics(ZymoExamplePseq,
+                               mock_db = ZymoTrainingSet,
                                multithread= 2,
-                               minBoot = 80)
+                               threshold = 80,
+                               strand = "top",
+                               verbose = FALSE)
 plotZymoDefault(output.dat)
 
 }

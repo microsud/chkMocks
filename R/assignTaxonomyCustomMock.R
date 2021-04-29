@@ -55,7 +55,7 @@ assignTaxonomyCustomMock <- function(x,
                                     multithread=multithread,
                                     minBoot = multithread)
 
-  nw_x <- .format_tax_table(x, taxa=new_tx)
+  #nw_x <- .format_tax_table(x, taxa=new_tx)
   nw_x <- .get_species_comp(nw_x)
   return(nw_x)
 

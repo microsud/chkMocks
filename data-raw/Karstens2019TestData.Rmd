@@ -1,0 +1,34 @@
+---
+title: 'Create example phyloseq for ZymoMcks'
+author: "Sudarshan"
+date: "4/28/2021"
+output: html_document
+---
+
+
+```{r}
+library(chkMocks)
+library(phyloseq)
+```
+
+```{r}
+ps <- readRDS("../data-raw/Karstens2019.rds")
+ps
+# check taxa names are ASVs
+#taxa_names(ps)[1:2] 
+
+```
+
+```{r}
+ps <-  subset_samples(ps,sample_names(ps)!= 'Blank')
+ZymoExamplePseq <- prune_taxa(taxa_sums(ps)>0,ps)
+#table(tax_table(ps)[,"Genus"], useNA = "always")
+sample_sums(ZymoExamplePseq)
+
+```
+
+```{r}
+usethis::use_data(ZymoExamplePseq, overwrite = TRUE, compress = "xz")
+```
+
+

@@ -22,9 +22,8 @@ Correlation between theoretical and experimental mocks.
 }
 \examples{
 library(phyloseq)
-ps.zym <- ZymoExamplePseq
-taxa_names(ps.zym) <- refseq(ps.zym)
-compare2theorectical(ps.zym, theoretical_id = "somename")
+ZymoExamplePseq
+compare2theorectical(ZymoExamplePseq, theoretical_id = "somename")
 
 }
 \author{

@@ -8,12 +8,12 @@
 #'
 #' @examples
 #' library(phyloseq)
-#' ps.zym <- ZymoExamplePseq
-#' taxa_names(ps.zym) <- refseq(ps.zym)
-#' output.dat <- checkZymoBiomics(ps.zym,
-#'                                mock_db = NULL,
+#' output.dat <- checkZymoBiomics(ZymoExamplePseq,
+#'                                mock_db = ZymoTrainingSet,
 #'                                multithread= 2,
-#'                                minBoot = 80)
+#'                                threshold = 80,
+#'                                strand = "top",
+#'                                verbose = FALSE)
 #' plotZymoDefault(output.dat)
 #'
 #' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
@@ -27,12 +27,14 @@
 
 plotZymoDefault <- function(x){
 
-  ZymoTheoretical <- abundance <- chk.names <- NULL
+  ZymoTheoretical <- abundance <- sample.chkmks <- chk.names <- FeatureID <- NULL
   if(class(x)=="list"
      && class(x[[1]])=="phyloseq"
-     && class(x[[2]])[3]=="data.frame") {
+     && class(x[[2]])=="phyloseq"
+     && class(x[[3]])[3]=="data.frame") {
 
-    ldf <- .get_long_tib(x$pseq)
+
+    ldf <- .get_long_tib(x$ps_species)
 
     # Correlation data
     cor.dat <- x$corrTable %>%
@@ -54,7 +56,9 @@ plotZymoDefault <- function(x){
                   Lactobacillus.fermentum="#F0E442",
                   Escherichia.coli="#0072B2",
                   Salmonella.enterica="#EC6E0B",
-                  Pseudomonas.aeruginosa="#C1066E"
+                  Pseudomonas.aeruginosa="#C1066E",
+                  na.value = "#bababa",
+                  Unknown = "#bababa"
 
     )
 

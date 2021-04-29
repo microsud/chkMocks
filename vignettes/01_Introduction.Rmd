@@ -1,0 +1,83 @@
+---
+title: "Introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Every microbiome sequencing experiment must have a positive control. However, how do we make use of these mock controls to guide our quality check is not easily available. A basic question to asks, _Is the composition in experimental mock standards similar to theoretical expected composition?_    
+We can visually compare the composition bar-plots and check for correlation between experimental and theoretical community composition.  
+`chkMocks` eases these basic comparisons.  
+Note: Currently, only ZymoBiomics mocks are supported and we are working on adding support for custom databases. 
+
+```{r setup}
+library(chkMocks)
+library(dplyr)
+library(phyloseq)
+library(patchwork)
+library(ggplot2)
+```
+
+## ZymoBiomics     
+Before starting the analysis you need:  
+
+* A phyloseq object with mock community composition and must have `taxa_names` as ASV seqs   
+
+Here, the example data are from Karstens L, Asquith M, Davin S, Fair D, Gregory WT, Wolfe AJ, Braun J, McWeeney S. 2019. [Controlling for contaminants in low-biomass 16S rRNA gene sequencing experiments](https://doi.org/10.1128/mSystems.00290-19). mSystems 4:e00290-19.  
+
+```{r}
+
+ZymoExamplePseq
+
+```
+
+A single function, `checkZymoBiomics` will do the following:  
+
+Take an input phyloseq object of mock communities with `taxa_names` as ASV seqs and `ZymoTrainingSet` to assign taxonomy. The `ZymoTrainingSet` is a with only the full-lenght 16S rRNA gene sequences of the candidates in ZymoBIOMICS™ Microbial Community Standard. [Catalog No. D6300](https://files.zymoresearch.com/protocols/_d6300_zymobiomics_microbial_community_standard.pdf). 
+ASVs unrelated to `ZymoTrainingSet` are unclassified. The function will return two phyloseq objects a) ASVs level and b) Agglomerated at Species level. The agglomerated species level data is used to check for correlation with theoretical composition.  
+
+```{r}
+output.dat <- checkZymoBiomics(ZymoExamplePseq,
+                               mock_db = ZymoTrainingSet,
+                               multithread= 2,
+                               threshold = 80,
+                               verbose = FALSE)
+```
+
+Get the agglomerated species level data.
+```{r}
+ps_species <- output.dat$ps_species
+
+ps_species
+```
+
+Check assignments
+```{r}
+
+get_taxa_unique(output.dat$ps_species, "Species")
+
+```
+
+Plot composition  
+```{r fig.height=4, fig.width=8}
+
+plotZymoDefault(output.dat) 
+
+```
+
+The above plot demonstrates how well/bad the experimental mocks behaved compared to theoretical composition.  
+The data from Karstens L, et al., 2019. [mSystems](https://doi.org/10.1128/mSystems.00290-19) started from cells->DNA extraction->pcr amplification->sequencing. At every step there is a possibility for bias. This is demonstrated with undiluted mock sample showing low correlation. Additionally, diluted samples have several unknown, potential contaminants common to low-biomass samples.    
+
+```{r}
+devtools::session_info()
+```
+

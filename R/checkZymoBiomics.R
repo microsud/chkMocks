@@ -6,22 +6,28 @@
 #'
 #' @param x Phyloseq objects where taxa_names are ASV sequences
 #'
-#' @param mock_db Default is NULL and uses ZymoBiomics sequences
+#' @param mock_db ZymoTrainingSet
 #'
-#' @param multithread Passed on to dada2::assignTaxonomy Default is 2
+#' @param multithread Passed on to DECIPHER::IdTaxa Default is NULL
 #'
-#' @param minBoot Passed on to dada2::assignTaxonomy. Default is 80
+#' @param threshold Passed on to DECIPHER::IdTaxa. Default is 60
 #'
-#' @param ... Arguments to pass on to dada2::assignTaxonomy
+#' @param verbose Default is FALSE
+#'
+#' @param strand DECIPHER::IdTaxa Default is top
+#'
+#' @param ... Arguments to pass on to DECIPHER::IdTaxa
 #'
 #' @examples
 #' library(phyloseq)
-#' ps.zym <- ZymoExamplePseq
-#' taxa_names(ps.zym) <- refseq(ps.zym)
-#' output.dat <- checkZymoBiomics(ps.zym,
-#'                                mock_db = NULL,
+#'
+#' output.dat <- checkZymoBiomics(ZymoExamplePseq,
+#'                                mock_db = ZymoTrainingSet,
 #'                                multithread= 2,
-#'                                minBoot = 80)
+#'                                threshold = 80,
+#'                                strand = "top",
+#'                                verbose = FALSE)
+#'
 #' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
 #'
 #' @return List with pseq, and cor table
@@ -30,24 +36,29 @@
 #' @importFrom tibble as_tibble
 #'
 #' @export
+#'
 
 checkZymoBiomics <- function(x,
                              mock_db = NULL,
                              multithread= 2,
-                             minBoot = 80,
+                             threshold = 60,
+                             verbose = FALSE,
+                             strand = "top",
                              ...) {
 
-
+  if(is.null(mock_db)){
+    stop("Specifiy `mock_db` ZymoTrainingSet")
+  }
   sample.chkmks <- ZymoTheoretical <- row.sample <- NULL
-  seqs <- phyloseq::taxa_names(x)
-  new_tx <- .assign_zymo_taxonomy(seqs,
-                                  mock_db = NULL,
-                                  multithread=multithread,
-                                  minBoot = multithread)
 
-  nw_x <- .format_tax_table(x, taxa=new_tx)
+  new_tx <- .assign_zymo_taxonomy(x,
+                                  mock_db = mock_db,
+                                  processors=multithread,
+                                  threshold = threshold,
+                                  strand = strand,
+                                  verbose = verbose)
 
-  nw_x <- .get_species_comp(nw_x)
+  nw_x <- .get_species_comp(new_tx)
 
   # merge with theoretical
   phyloseq::sample_data(ZymoBiomicsPseq)$ZymoType <- "Theoretical"
@@ -60,64 +71,64 @@ checkZymoBiomics <- function(x,
     tibble::add_row(sample.chkmks= "ZymoTheoretical", ZymoTheoretical = 1) %>%
     dplyr::mutate(row.sample = stats::reorder(sample.chkmks, ZymoTheoretical))
 
-  return(list("pseq"=zm.all.ps,
+  return(list("ps_asv"=new_tx,
+              "ps_species"=zm.all.ps,
               "corrTable" = tex_cor))
 
 }
 
-#' @importFrom dada2 assignTaxonomy
+#' @importFrom DECIPHER IdTaxa
+#' @importFrom Biostrings DNAStringSet
+#' @importFrom phyloseq taxa_names tax_table
+#' @importFrom tidyr separate
+#' @importFrom dplyr select
 .assign_zymo_taxonomy <- function(x,
-                                  mock_db = NULL,
-                                  multithread=multithread,
-                                  minBoot = multithread, ...){
+                                  mock_db = mock_db,
+                                  processors = processors,
+                                  threshold = threshold,
+                                  strand = strand,
+                                  verbose = verbose, ...){
 
-  if(is.null(mock_db)){
-    message("Using internal reference database
+  message("Using internal reference database
             for ZymoBiomics")
-    db <- system.file("extdata", "ZymoDb.fasta",
-                      package="chkMocks", mustWork = TRUE)
 
-  } else{
+  Classification  <- root <- NULL
+  dna <- Biostrings::DNAStringSet(taxa_names(x)) # Create a DNAStringSet from the ASVs
 
-    db <- mock_db
+  ids <- DECIPHER::IdTaxa(dna, mock_db, strand=strand,
+                          processors=processors,
+                          threshold = threshold,
+                          verbose = verbose)
 
-  }
+  ranks <- c("Root","Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species") # ranks of interest
+  assignment <- sapply(ids,
+                       function(x)
+                         paste(x$taxon,
+                               collapse=";"))
 
+  #class(assignment)
 
-  zym_taxa <- dada2::assignTaxonomy(x,
-                                    db,
-                                    multithread=multithread,
-                                    minBoot = multithread)
-  return(zym_taxa)
-
-}
-
-
-#' @importFrom phyloseq tax_table tax_table<-
-#' @importFrom tibble rownames_to_column column_to_rownames
-#' @importFrom dplyr mutate_if na_if
-.format_tax_table <- function(ps, taxa){
-
-  phyloseq::tax_table(ps) <- phyloseq::tax_table(taxa)
-  tib <- phyloseq::tax_table(ps) %>%
+  ranks <- c("root","domain", "phylum", "class", "order", "family", "genus", "species") # ranks of interest
+  zym_taxa <- data.frame(row.names = taxa_names(x),
+                         Classification=assignment) %>%
+    tidyr::separate(Classification, ranks, ";") %>%
+    dplyr::select(!root) %>%
     as.matrix() %>%
-    as.data.frame() %>%
-    tibble::rownames_to_column("FeatureID") %>%
-    dplyr::mutate_if(is.character, list(~ na_if(., ""))) %>%
-    #replace(is.na(.), "Exogenous") %>%
-    tibble::column_to_rownames("FeatureID") %>%
-    as.matrix()
+    phyloseq::tax_table()
 
-  phyloseq::tax_table(ps) <- phyloseq::tax_table(tib)
-  return(ps)
+  # add new toaxonomy
+  phyloseq::tax_table(x) <- zym_taxa
+
+  return(x)
 
 }
+
 
 #' @importFrom microbiome transform aggregate_taxa
 #' @importFrom phyloseq otu_table otu_table<-
 .get_species_comp <- function(x){
 
-  x <- microbiome::aggregate_taxa(x, "Species")
+  x <- microbiome::aggregate_taxa(x, "species")
   x <- microbiome::transform(x, "compositional")
   phyloseq::otu_table(x) <- phyloseq::otu_table(x) *100
   return(x)
@@ -136,12 +147,13 @@ checkZymoBiomics <- function(x,
     tibble::as_tibble()
 
   tex_cor <- suppressMessages(corrr::correlate(otu.tb,
-                       method = "spearman",
-                       use = 'everything')) %>%
+                                               method = "spearman",
+                                               use = 'everything')) %>%
     corrr::focus(ZymoTheoretical) %>%
     dplyr::rename(sample.chkmks="term")
 
   return(tex_cor)
 
 }
+
 

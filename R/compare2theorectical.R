@@ -8,9 +8,8 @@
 #'
 #' @examples
 #' library(phyloseq)
-#' ps.zym <- ZymoExamplePseq
-#' taxa_names(ps.zym) <- refseq(ps.zym)
-#' compare2theorectical(ps.zym, theoretical_id = "somename")
+#' ZymoExamplePseq
+#' compare2theorectical(ZymoExamplePseq, theoretical_id = "somename")
 #'
 #' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
 #'
@@ -45,8 +44,8 @@ compare2theorectical <- function(x, theoretical_id){
 
 
     tex_cor <- suppressMessages(corrr::correlate(otu.tb,
-                                                 method = "pearson",
-                                                 use = 'pairwise.complete.obs')) %>%
+                                                 method = "spearman",
+                                                 use = 'everything')) %>%
       corrr::focus(dplyr::all_of(theoretical_id))
     return(tex_cor)
   }

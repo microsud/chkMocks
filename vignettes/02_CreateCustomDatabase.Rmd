@@ -1,0 +1,137 @@
+---
+title: "Create a custome database"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Create a custome database}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This is experimental stage!  
+
+How to prepare a custom training set for `DECIPHER::IdTaxa`?  
+
+# Library  
+```{r eval=FALSE}
+library(DECIPHER)
+```
+
+Read the fasta file with 16S rRNA gene sequences for taxa in mock community.  
+
+```{r eval=FALSE}
+# Here example is store in the package.
+db <- system.file("extdata", "ZymoDb.fasta",
+                      package="chkMocks", mustWork = TRUE)
+#path for file
+db
+
+```
+Convert to `DNAStringSet`.  
+```{r eval=FALSE}
+seqs <- Biostrings::readDNAStringSet(db)
+seqs <- OrientNucleotides(seqs)
+# check first 2 as example
+names(seqs)[1:2]
+
+```
+Now, adding the dummy seq name before > and adding a 'Root' before Bacteria;Phylum;etc; 
+```{r eval=FALSE}
+# here, adding the dummy seq name before > and adding a 'Root' before Bacteria;Phylum;etc;
+names(seqs) <- paste0("ZymoSeq", seq(1:length(names(seqs))), " ", "Root;" ,names(seqs))
+
+# check first 2 as example
+names(seqs)[1:2]
+```
+We show how to check for problematic taxonomies. However, it will most likely be not required if input fasta is formatted correctly. 
+```{r eval=FALSE}
+groups <- names(seqs) # sequence names
+groups <- gsub("(.*)(Root;)", "\\2", groups)
+groupCounts <- table(groups)
+u_groups <- names(groupCounts)
+length(u_groups)
+maxGroupSize <- 10 # max sequences per label (>= 1)
+remove <- logical(length(seqs))
+```
+
+Create a training set.  
+
+```{r eval=FALSE}
+maxIterations <- 3
+allowGroupRemoval <- FALSE
+probSeqsPrev <- integer()
+
+for (i in which(groupCounts > maxGroupSize)) {
+  index <- which(groups==u_groups[i])
+  keep <- sample(length(index),
+                 maxGroupSize)
+  remove[index[-keep]] <- TRUE
+}
+sum(remove)
+
+taxid <- NULL
+for (i in seq_len(maxIterations)) {
+  cat("Training iteration: ", i, "\n", sep="")
+  # train the classifier
+  ZymoTrainingSet <- LearnTaxa(seqs[!remove],
+                           names(seqs)[!remove],
+                           taxid)
+  # look for problem sequences
+  probSeqs <- ZymoTrainingSet$problemSequences$Index
+  if (length(probSeqs)==0) {
+    cat("No problem sequences remaining.\n")
+    break
+  } else if (length(probSeqs)==length(probSeqsPrev) &&
+             all(probSeqsPrev==probSeqs)) {
+    cat("Iterations converged.\n")
+    break
+  }
+  if (i==maxIterations)
+    break
+  probSeqsPrev <- probSeqs
+  # remove any problem sequences
+  index <- which(!remove)[probSeqs]
+  remove[index] <- TRUE # remove all problem sequences
+  if (!allowGroupRemoval) {
+    # replace any removed groups
+    missing <- !(u_groups %in% groups[!remove])
+    missing <- u_groups[missing]
+    if (length(missing) > 0) {
+      index <- index[groups[index] %in% missing]
+      remove[index] <- FALSE # don't remove
+    }
+  }
+}
+
+```
+Check any problems. We do not have it in this example.  
+```{r eval=FALSE}
+sum(remove)
+length(probSeqs)
+
+```
+
+Check training set. 
+
+```{r eval=FALSE}
+ZymoTrainingSet
+# for internal
+#usethis::use_data(ZymoTrainingSet, overwrite = TRUE, compress = "xz")
+
+```
+
+```{r eval=FALSE}
+ plot(ZymoTrainingSet)
+```
+
+
+```{r eval=FALSE}
+devtools::session_info()
+```
+

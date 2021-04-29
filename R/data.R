@@ -104,8 +104,18 @@ NULL
 #'              in different sequencing libraries as postive controls.
 #'
 #' @details ZymoExamplePseq contains the \emph{experimental} 16S composition of
-#'          ZymoBIOMICS Microbial Community Standard. 19 sample, 390 ASVs and 7
-#'          taxonomic ranks.
+#'          ZymoBIOMICS Microbial Community Standard. 9 samples, 946 ASVs and 7
+#'          taxonomic ranks. ZymoBIOMIC mock community standards consisting of
+#'          eight bacterial species \emph{Pseudomonas.aeruginosa},
+#'          \emph{Escherichia coli}, \emph{Salmonella.enterica},
+#'          \emph{Lactobacillus.fermentum}, \emph{Enterococcus.faecalis},
+#'          \emph{Staphylococcus.aureus}, \emph{Listeria.monocytogenes},
+#'          \emph{Bacillus.subtilis} and two fungal species
+#'          \emph{Saccharomyces.cerevisiae} and \emph{Cryptococcus.neoformans}.
+#'          The dilutions were done in microbial free water (Qiagen) in
+#'          eight rounds of a serial three-fold dilution
+#'          prior to DNA extraction. The data are for the V4 region of the
+#'          16S rRNA gene profiled with Illumina MiSeq.
 #'
 #' @name ZymoExamplePseq
 #'
@@ -122,6 +132,53 @@ NULL
 #' @keywords Data
 #'
 #' @references
-#'
+#' \itemize{
+#' \item{}{Karstens L, Asquith M, Davin S, Fair D, Gregory WT, Wolfe AJ,
+#'         Braun J, McWeeney S. (2019) Controlling for contaminants in
+#'         low-biomass 16S rRNA gene sequencing experiments.
+#'        \emph{mSystems}, 4:e00290-19.
+#'        \url{https://doi.org/10.1128/mSystems.00290-19}
+#' }
+#' }
 #' Shetty SA 2021
 NULL
+
+#' @title ZymoTrainingSet
+#'
+#' @description Contains ZymoTrainingSet compatible with DECIPHER::IdTaxa.
+#'
+#' @details ZymoTrainingSet contains 16S sequences of
+#'          ZymoBIOMICS Microbial Community Standard. ZymoBIOMIC mock community
+#'          standards consisting of
+#'          eight bacterial species \emph{Pseudomonas.aeruginosa},
+#'          \emph{Escherichia coli}, \emph{Salmonella.enterica},
+#'          \emph{Lactobacillus.fermentum}, \emph{Enterococcus.faecalis},
+#'          \emph{Staphylococcus.aureus}, \emph{Listeria.monocytogenes},
+#'          \emph{Bacillus.subtilis} and two fungal species
+#'          \emph{Saccharomyces.cerevisiae} and \emph{Cryptococcus.neoformans}.
+#'
+#' @name ZymoTrainingSet
+#'
+#' @docType data
+#'
+#' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
+#'
+#' @usage data(ZymoTrainingSet)
+#'
+#' @return Loads the data set in R.
+#'
+#' @format TrainingSet object
+#'
+#' @keywords Data
+#'
+#' @references
+#' \itemize{
+#' \item{}{ZymoBIOMICS™ Microbial Community Standard.
+#'        \emph{Catalog No. D6300.
+#'        \url{https://files.zymoresearch.com/protocols/_d6300_zymobiomics_microbial_community_standard.pdf}
+#' }
+#' }
+#' }
+#' Shetty SA 2021
+NULL
+
