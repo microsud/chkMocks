@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 This is experimental stage!  
 
 How to prepare a custom training set for `DECIPHER::IdTaxa`?  
+These are from the [DECIPHER](https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf) package.  
 
 # Library  
 ```{r eval=FALSE}

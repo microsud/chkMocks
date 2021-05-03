@@ -7,57 +7,78 @@
 #'          This is done to avoid any clashes/changes that happen with public databases
 #'          and to get a direct comparison.
 #'
-#' @param x A phyloseq object with experimental and theoretical composition
-#' @param mock_db Path to custom database
-#' @param multithread Passed on to dada2::assignTaxonomy Default is 2
+#' @param x Phyloseq objects where taxa_names are ASV sequences
 #'
-#' @param minBoot Passed on to dada2::assignTaxonomy. Default is 80
+#' @param mock_db ZymoTrainingSet
 #'
-#' @param ... Arguments to pass on to dada2::assignTaxonomy
+#' @param processors Passed on to DECIPHER::IdTaxa Default is NULL
+#'
+#' @param threshold Passed on to DECIPHER::IdTaxa. Default is 60
+#'
+#' @param verbose Default is FALSE
+#'
+#' @param strand DECIPHER::IdTaxa Default is top
+#'
+#' @param ... Arguments to pass on to DECIPHER::IdTaxa
 #'
 #' @examples
 #' #output.dat <- assignTaxonomyCustomMock(ps.zym,
 #'  #                                      mock_db = NULL,
-#'   #                                     multithread= 2,
-#'    #                                    minBoot = 80)
+#'   #                                     processors = 2,
+#'    #                                    threshold = 80)
 #' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
 #'
-#' @return Correlation table
+#' @return Phyloseq with new taxonomy
 #'
-#' @importFrom dplyr %>%
-#' @importFrom tibble as_tibble
-#' @importFrom phyloseq otu_table sample_names
-#' @importFrom corrr correlate focus
+#' @importFrom DECIPHER IdTaxa
+#' @importFrom Biostrings DNAStringSet
+#' @importFrom phyloseq taxa_names tax_table
+#' @importFrom tidyr separate
+#' @importFrom dplyr select
 #'
 #' @export
 #' @importFrom dada2 assignTaxonomy
 assignTaxonomyCustomMock <- function(x,
                                      mock_db = NULL,
-                                     multithread=multithread,
-                                     minBoot = multithread, ...){
+                                     processors = NULL,
+                                     threshold = 60,
+                                     strand = "top",
+                                     verbose = FALSE, ...){
 
   if(is.null(mock_db)){
-    warning("No reference fasta provided!! Using internal reference database
-            for ZymoBiomics")
-    db <- system.file("extdata", "ZymoDb.fasta",
-                      package="chkMocks", mustWork = TRUE)
 
-  } else{
-
-    db <- mock_db
+    stop("Please provide reference trainingset")
 
   }
 
-  seqs <- phyloseq::taxa_names(x)
+  Classification  <- root <- NULL
+  dna <- Biostrings::DNAStringSet(taxa_names(x)) # Create a DNAStringSet from the ASVs
 
-  new_tx <- dada2::assignTaxonomy(seqs,
-                                    db,
-                                    multithread=multithread,
-                                    minBoot = multithread)
+  ids <- DECIPHER::IdTaxa(dna, mock_db, strand=strand,
+                          processors=processors,
+                          threshold = threshold,
+                          verbose = verbose)
 
-  #nw_x <- .format_tax_table(x, taxa=new_tx)
-  nw_x <- .get_species_comp(nw_x)
-  return(nw_x)
+  ranks <- c("Root","Domain", "Phylum", "Class", "Order", "Family", "Genus", "Species") # ranks of interest
+  assignment <- sapply(ids,
+                       function(x)
+                         paste(x$taxon,
+                               collapse=";"))
+
+  #class(assignment)
+
+  ranks <- c("root","domain", "phylum", "class", "order", "family", "genus", "species") # ranks of interest
+  custom_taxa <- data.frame(row.names = taxa_names(x),
+                            Classification=assignment) %>%
+    tidyr::separate(Classification, ranks, ";") %>%
+    dplyr::select(!root) %>%
+    as.matrix() %>%
+    phyloseq::tax_table()
+
+  # add new taxonomy
+  phyloseq::tax_table(x) <- custom_taxa
+
+  return(x)
 
 }
 

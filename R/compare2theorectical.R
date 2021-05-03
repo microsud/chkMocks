@@ -45,7 +45,7 @@ compare2theorectical <- function(x, theoretical_id){
 
     tex_cor <- suppressMessages(corrr::correlate(otu.tb,
                                                  method = "spearman",
-                                                 use = 'everything')) %>%
+                                                 use = 'all.obs')) %>%
       corrr::focus(dplyr::all_of(theoretical_id))
     return(tex_cor)
   }

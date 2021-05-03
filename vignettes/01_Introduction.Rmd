@@ -14,10 +14,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+Look at your mocks... 
+
 Every microbiome sequencing experiment must have a positive control. However, how do we make use of these mock controls to guide our quality check is not easily available. A basic question to asks, _Is the composition in experimental mock standards similar to theoretical expected composition?_    
 We can visually compare the composition bar-plots and check for correlation between experimental and theoretical community composition.  
 `chkMocks` eases these basic comparisons.  
-Note: Currently, only ZymoBiomics mocks are supported and we are working on adding support for custom databases. 
+Note: Currently, only `ZymoBiomics` mocks are supported and we are working on adding support for custom databases. 
 
 ```{r setup}
 library(chkMocks)
@@ -49,9 +51,12 @@ ASVs unrelated to `ZymoTrainingSet` are unclassified. The function will return t
 output.dat <- checkZymoBiomics(ZymoExamplePseq,
                                mock_db = ZymoTrainingSet,
                                multithread= 2,
-                               threshold = 80,
+                               threshold = 60,
                                verbose = FALSE)
+
+output.dat$corrTable
 ```
+
 
 Get the agglomerated species level data.
 ```{r}
@@ -70,14 +75,42 @@ get_taxa_unique(output.dat$ps_species, "Species")
 Plot composition  
 ```{r fig.height=4, fig.width=8}
 
-plotZymoDefault(output.dat) 
-
+p <- plotZymoDefault(output.dat)
+p
 ```
 
 The above plot demonstrates how well/bad the experimental mocks behaved compared to theoretical composition.  
 The data from Karstens L, et al., 2019. [mSystems](https://doi.org/10.1128/mSystems.00290-19) started from cells->DNA extraction->pcr amplification->sequencing. At every step there is a possibility for bias. This is demonstrated with undiluted mock sample showing low correlation. Additionally, diluted samples have several unknown, potential contaminants common to low-biomass samples.    
 
+Check how individual taxa were measured.  
+```{r fig.width=6, fig.height=4}
+p <- plotZymoDefault(output.dat)
+
+p[[1]] + facet_wrap(~FeatureID) + 
+  theme_minimal(base_size = 10) + 
+  theme(legend.position = "none",
+        strip.text = element_text(face="italic"))
+```
+
+Looking at individual strain abundances indicates under severe counting of _Staphylococcus aureus_. It is also important to note the limitations of species level assignments for short-read length ASVs.  
+
+In the diluted mock samples, there are `Unknown` taxa i.e. those that are not of ZymoBiomics origin.  
+Check for their contribution.  
+```{r}
+sp.df <- phyloseq::psmelt(ps_species) %>%
+  dplyr::filter(species=="Unknown")
+
+ggplot(sp.df, aes(Sample, Abundance)) + 
+  geom_col() + theme_minimal() +
+  ggplot2::ylab("Abundance (%)")+
+      ggplot2::xlab("Samples")
+
+```
+The lowest dilution, D8, is 80% non-ZymoBiomics taxa.  
+
+
 ```{r}
 devtools::session_info()
 ```
 
+Disclaimer: While we use ZymoBiomics data, we the developers of `chkMocks` are not associated with the manufacturers and this work should not be considered as an endorsement for the said product.    

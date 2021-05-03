@@ -148,7 +148,7 @@ checkZymoBiomics <- function(x,
 
   tex_cor <- suppressMessages(corrr::correlate(otu.tb,
                                                method = "spearman",
-                                               use = 'everything')) %>%
+                                               use = 'all.obs')) %>%
     corrr::focus(ZymoTheoretical) %>%
     dplyr::rename(sample.chkmks="term")
 

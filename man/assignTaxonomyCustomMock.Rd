@@ -7,24 +7,30 @@
 assignTaxonomyCustomMock(
   x,
   mock_db = NULL,
-  multithread = multithread,
-  minBoot = multithread,
+  processors = NULL,
+  threshold = 60,
+  strand = "top",
+  verbose = FALSE,
   ...
 )
 }
 \arguments{
-\item{x}{A phyloseq object with experimental and theoretical composition}
+\item{x}{Phyloseq objects where taxa_names are ASV sequences}
 
-\item{mock_db}{Path to custom database}
+\item{mock_db}{ZymoTrainingSet}
 
-\item{multithread}{Passed on to dada2::assignTaxonomy Default is 2}
+\item{processors}{Passed on to DECIPHER::IdTaxa Default is NULL}
 
-\item{minBoot}{Passed on to dada2::assignTaxonomy. Default is 80}
+\item{threshold}{Passed on to DECIPHER::IdTaxa. Default is 60}
 
-\item{...}{Arguments to pass on to dada2::assignTaxonomy}
+\item{strand}{DECIPHER::IdTaxa Default is top}
+
+\item{verbose}{Default is FALSE}
+
+\item{...}{Arguments to pass on to DECIPHER::IdTaxa}
 }
 \value{
-Correlation table
+Phyloseq with new taxonomy
 }
 \description{
 Assign Custom Mocks Taxonomy
@@ -38,8 +44,8 @@ For consistency in taxonomic assignments, use only a small database
 \examples{
 #output.dat <- assignTaxonomyCustomMock(ps.zym,
  #                                      mock_db = NULL,
-  #                                     multithread= 2,
-   #                                    minBoot = 80)
+  #                                     processors = 2,
+   #                                    threshold = 80)
 }
 \author{
 Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
