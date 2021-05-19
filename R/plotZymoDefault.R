@@ -119,7 +119,7 @@ plotZymoDefault <- function(x){
     tibble::as_tibble()
 
   ldf <- otu.tib %>%
-    left_join(sam_tib,by = "chk.names")
+    dplyr::left_join(sam_tib,by = "chk.names")
 
   return(ldf)
 }
