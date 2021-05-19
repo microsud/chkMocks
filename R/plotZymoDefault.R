@@ -109,17 +109,17 @@ plotZymoDefault <- function(x){
     as.data.frame() %>%
     tibble::rownames_to_column("FeatureID") %>%
     tidyr::pivot_longer(!FeatureID)%>%
-    dplyr::left_join(tx.tib) %>%
+    dplyr::left_join(tx.tib, by="FeatureID") %>%
     dplyr::rename(chk.names=name,
                   abundance=value)
 
-  sam_tib <- phyloseq::sample_data(x) %>%
-    as.data.frame(stringsAsFactors=FALSE) %>%
+  sam_tib <- as(phyloseq::sample_data(x),"data.frame") %>%
+    #as.data.frame(stringsAsFactors=FALSE) %>%
     tibble::rownames_to_column("chk.names") %>%
     tibble::as_tibble()
 
   ldf <- otu.tib %>%
-    left_join(sam_tib)
+    left_join(sam_tib,by = "chk.names")
 
   return(ldf)
 }

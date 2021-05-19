@@ -21,6 +21,15 @@ We can visually compare the composition bar-plots and check for correlation betw
 `chkMocks` eases these basic comparisons.  
 Note: Currently, only `ZymoBiomics` mocks are supported and we are working on adding support for custom databases. 
 
+**Install** 
+```{r eval=FALSE}
+
+library(devtools) # make sure you have installed devtools
+install_github("microsud/chkMocks")
+
+```
+
+
 ```{r setup}
 library(chkMocks)
 library(dplyr)
@@ -98,7 +107,7 @@ In the diluted mock samples, there are `Unknown` taxa i.e. those that are not of
 Check for their contribution.  
 ```{r}
 sp.df <- phyloseq::psmelt(ps_species) %>%
-  dplyr::filter(species=="Unknown")
+  dplyr::filter(species=="Unknown" & Sample !="ZymoTheoretical")
 
 ggplot(sp.df, aes(Sample, Abundance)) + 
   geom_col() + theme_minimal() +
@@ -113,4 +122,4 @@ The lowest dilution, D8, is 80% non-ZymoBiomics taxa.
 devtools::session_info()
 ```
 
-Disclaimer: While we use ZymoBiomics data, we the developers of `chkMocks` are not associated with the manufacturers and this work should not be considered as an endorsement for the said product.    
+Disclaimer: While we use `ZymoBiomics` data, we the developers of `chkMocks` are not associated with the manufacturers and this work should not be considered as an endorsement for the said product.    
