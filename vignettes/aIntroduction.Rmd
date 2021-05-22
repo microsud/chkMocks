@@ -114,7 +114,7 @@ p[[1]] + facet_wrap(~FeatureID) +
         strip.text = element_text(face="italic"))
 ```
 
-Looking at individual strain abundances indicates under severe counting of _Staphylococcus aureus_. It is also important to note the limitations of species level assignments for short-read length ASVs.  
+Looking at individual strain abundances indicates under counting of _Staphylococcus aureus_. It is also important to note the limitations of species level assignments for short-read length ASVs.  
 
 In the diluted mock samples, there are `Unknown` taxa i.e. those that are not of ZymoBiomics origin.  
 Check for their contribution.  
@@ -128,7 +128,17 @@ ggplot(sp.df, aes(Sample, Abundance)) +
       ggplot2::xlab("Samples")
 
 ```
-The lowest dilution, D8 has 80% non-ZymoBiomics taxa, so make sure you have negative controls and check the article by Karstens L, et al. [Controlling for contaminants in low-biomass 16S rRNA gene sequencing experiments](https://doi.org/10.1128/mSystems.00290-19). mSystems 4:e00290-19. All codes available from their analysis are available openly. 
+The lowest dilution, D8 has 80% non-ZymoBiomics taxa, so make sure you have negative controls and check the article by Karstens L, et al. [Controlling for contaminants in low-biomass 16S rRNA gene sequencing experiments](https://doi.org/10.1128/mSystems.00290-19). mSystems 4:e00290-19. All codes from their analysis are available openly. 
+Note: The taxonomy of lactobacilli has been updated from _L. fermentum_ is _Limosilactobacillus_  [Zheng J., Wittouck S., Salvetti E. et al.,(2020). A taxonomic note on the genus _Lactobacillus_: Description of 23 novel genera, emended description of the genus _Lactobacillus_ Beijerink 1901, and union of _Lactobacillaceae_ and _Leuconostocaceae_.](https://doi.org/10.1099/ijsem.0.004107)   
+Thanks to [Giovanna Felis](https://twitter.com/FelisGiovanna) for bringing this to my notice on twitter.  
+The label for _L. fermentum_ is still being used by ZymoBiomics and will keep it as it is for now.  
+
+**Other independently developed tools that are:**     
+ZymoResearch [miqScore16SPublic](https://github.com/Zymo-Research/miqScore16SPublic) by [Michael Weinstein](https://twitter.com/bionomicon)   
+QIIME2 [q2-quality-control](https://github.com/qiime2/q2-quality-control) suggested by [Yanxian Li](https://twitter.com/li_yanxian)   
+OCMS [OCMS_zymoBIOMICS](https://github.com/OxfordCMS/OCMS_zymoBIOMICS) by [Nick Ilott](https://twitter.com/IlottNick)   
+
+Let me know if there are more tools that need to be mentioned here [GitHub issues](https://github.com/microsud/chkMocks/issues).  
 
 
 ```{r}

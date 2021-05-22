@@ -1,0 +1,417 @@
+---
+title: "Working with custom mocks"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with custom mocks}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>"
+)
+```
+
+
+In this examples, the step to work with custom mock communities is demonstrated.  
+The test data used in this example are from Ramiro-Garcia J, Hermes GDA, Giatsis C et al. [NG-Tax, a highly accurate and validated pipeline for analysis of 16S rRNA amplicons from complex biomes F1000Research 2018, 5:1791](https://doi.org/10.12688/f1000research.9227.2) [version 2; peer review: 2 approved, 1 approved with reservations, 1 not approved].  
+
+
+How to prepare a custom training set for `DECIPHER::IdTaxa`?  
+These are from the [DECIPHER](https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf) package.  
+
+# Library  
+```{r eval=T, message=FALSE, warning=FALSE}
+# Following packages are required  
+library(chkMocks)
+library(DECIPHER)
+library(microbiome)
+library(dplyr)
+library(corrr)
+library(Biostrings)
+library(reshape2)
+```
+
+Read the fasta file with 16S rRNA gene sequences for taxa in mock community.  
+
+```{r read-ref-fasta-mib, eval=T}
+
+# db <- "../MIBMocks/MIBPhylotypes.fasta" # path of custom fasta sequences 
+
+# Here example is store in the package.
+db <- system.file("extdata", "MIBPhylotypes.fasta",
+                      package="chkMocks", mustWork = TRUE)
+
+```
+
+Convert to `DNAStringSet`.  
+```{r prep-dna, eval=T} 
+
+seqs <- Biostrings::readDNAStringSet(db)
+seqs <- DECIPHER::OrientNucleotides(seqs)
+# check first 2 as example
+names(seqs)[1:2]
+
+```
+
+Now, adding the dummy seq name before > and adding a 'Root' before Bacteria;Phylum;etc; 
+```{r dummy-names, eval=T}
+# here, adding the dummy seq name before > and adding a 'Root' before Bacteria;Phylum;etc;
+names(seqs) <- paste0("MIB", seq(1:length(names(seqs))), " ", "Root;" ,names(seqs))
+
+# check first 2 as example
+names(seqs)[1:2]
+```
+We show how to check for problematic taxonomies. However, it will most likely be not required if input fasta is formatted correctly. 
+```{r rem-seqs, eval=FALSE}
+groups <- names(seqs) # sequence names
+groups <- gsub("(.*)(Root;)", "\\2", groups)
+groupCounts <- table(groups)
+u_groups <- names(groupCounts)
+length(u_groups)
+maxGroupSize <- 10 # max sequences per label (>= 1)
+remove <- logical(length(seqs))
+```
+
+Create a training set.  
+
+```{r train-fasta, eval=FALSE}
+maxIterations <- 3
+allowGroupRemoval <- FALSE
+probSeqsPrev <- integer()
+
+for (i in which(groupCounts > maxGroupSize)) {
+  index <- which(groups==u_groups[i])
+  keep <- sample(length(index),
+                 maxGroupSize)
+  remove[index[-keep]] <- TRUE
+}
+sum(remove)
+
+taxid <- NULL
+for (i in seq_len(maxIterations)) {
+  cat("Training iteration: ", i, "\n", sep="")
+  # train the classifier
+  MIBTrainingSet <- LearnTaxa(seqs[!remove],
+                              names(seqs)[!remove],
+                              taxid)
+  # look for problem sequences
+  probSeqs <- MIBTrainingSet$problemSequences$Index 
+  if (length(probSeqs)==0) {
+    cat("No problem sequences remaining.\n")
+    break
+  } else if (length(probSeqs)==length(probSeqsPrev) &&
+             all(probSeqsPrev==probSeqs)) {
+    cat("Iterations converged.\n")
+    break
+  }
+  if (i==maxIterations)
+    break
+  probSeqsPrev <- probSeqs
+  # remove any problem sequences
+  index <- which(!remove)[probSeqs]
+  remove[index] <- TRUE # remove all problem sequences
+  if (!allowGroupRemoval) {
+    # replace any removed groups
+    missing <- !(u_groups %in% groups[!remove])
+    missing <- u_groups[missing]
+    if (length(missing) > 0) {
+      index <- index[groups[index] %in% missing]
+      remove[index] <- FALSE # don't remove
+    }
+  }
+}
+
+```
+
+Check any problems. 
+```{r eval=FALSE}
+sum(remove)
+length(probSeqs)
+
+```
+
+```{r read-training, eval=TRUE}
+
+# saveRDS(MIBTrainingSet, "inst/extdata/MIBTrainingSet.rds")
+# Here MIBTrainingSet is stored in the package to reduce time for example.
+# Read data from package
+MIBTrainingSet <- system.file("extdata", "MIBTrainingSet.rds",
+                      package="chkMocks", mustWork = TRUE)
+#path for file
+MIBTrainingSet <- readRDS(MIBTrainingSet)
+
+
+```
+
+Check training set. 
+
+```{r plot-training, eval=TRUE}
+plot(MIBTrainingSet)
+
+```
+
+Check training set. 
+
+```{r check-mib-probs}
+
+# Problem seqs in reference?
+MIBTrainingSet$problemSequences
+
+# Which is the problem group
+MIBTrainingSet$problemGroups
+```
+
+`Bacteroides` seqs are highlighted here. These are common gut inhabitants. Closely related `Bacteroides` can be difficult to assign taxonomy at lowere levels.  
+
+
+There is `N` in some of the reference sequences and therefore it is highlighted.  
+
+## Create theoretical Phyloseq   
+
+### Get theoretical Composition MIBMocks  
+```{r read-th-comp}
+
+# mck.otu.th.path <- read.csv("../MIBMocks/TheoreticalCompositionMIBMocks.csv") 
+
+# Here example is store in the package.
+mck.otu.th.path <- system.file("extdata", "TheoreticalCompositionMIBMocks.csv",
+                      package="chkMocks", mustWork = TRUE)
+mck.otu <- read.csv(mck.otu.th.path)
+
+head(mck.otu)
+
+```
+
+
+The table above has theoretical composition.  
+
+```{r mk-otu}
+# make Species col as rownames
+rownames(mck.otu) <- mck.otu$Species
+
+# Remove first col `Species` and convert it to a matrix
+mck.otu <- mck.otu[,-1] %>% as.matrix() 
+
+head(mck.otu)
+```
+The matrix above can be convert to otu_table later.  
+
+Now create a dummy `sample_ _data` table.   
+```{r mk-sam}
+# SampleType here is label that should match one of your columns in sample_data in experimental samples phyloseq object.
+mck.sam <- data.frame(row.names = c(colnames(mck.otu)),
+                      SampleType = c("MyMockTheoretical","MyMockTheoretical")) %>%  
+  sample_data()
+mck.sam
+```
+
+Get the taxonomy for mock phylotype.      
+
+```{r mk-tax}
+
+# mck.taxonomy.th.path <- read.csv("../MIBMocks/TaxonomyMIBMocks.csv") 
+
+# Here example is store in the package.
+mck.taxonomy.th.path <- system.file("extdata", "TaxonomyMIBMocks.csv",
+                      package="chkMocks", mustWork = TRUE)
+mck.tax <- read.csv(mck.taxonomy.th.path)
+
+head(mck.tax)
+
+rownames(mck.tax) <- mck.tax$Species
+mck.tax <- mck.tax[,-1] %>% as.matrix() 
+
+head(mck.tax)
+```
+This is will be our `tax_table`
+
+Build a phyloseq object of theoretical composition  
+```{r mk-pseq-th}
+ps.th <- phyloseq(otu_table(mck.otu, taxa_are_rows = T), 
+                  sample_data(mck.sam),
+                  tax_table(mck.tax))
+
+ps.th
+
+```
+
+The MIB mock contain 55 phylotypes. There are two types of mocks viz., MC3 and MC4  
+```{r}
+sample_names(ps.th)
+```
+
+## Check composition of theoretical    
+
+```{r th-gen}
+ps.th.genus <- aggregate_taxa(ps.th, "Genus")
+plot_composition(ps.th.genus) + 
+  theme_minimal() +
+  theme(legend.position="right",
+        legend.key.size=unit(0.2,'cm'),
+        legend.text = element_text(face = "italic")) +
+  guides(col = guide_legend(ncol = 2))
+   
+```
+
+These are not very useful to visualize with barplots. Too many genera!  
+
+```{r th-heatmap}
+
+microbiome::plot_composition(ps.th.genus, plot.type = "heatmap") + 
+  scale_fill_viridis_c("Abudance (%)") +
+  theme(axis.text = element_text(hjust = 1),
+        axis.text.y = element_text(face = "italic")) + 
+  coord_flip()
+```
+
+## New experiment  
+```{r exper-mks}
+# Here example is store in the package.
+ps.mib.w <- system.file("extdata", "ps.mib.rds",
+                        package="chkMocks", mustWork = TRUE)
+#path for file
+ps.mib.w <- readRDS(ps.mib.w)
+
+# taxa names are ASV seqs. Check first 2 names/ASV seqs
+taxa_names(ps.mib.w)[1:2]
+```
+
+## Assign custom taxonomy  
+
+```{r assing-tax-exp-mocks}
+
+ps.mib <- assignTaxonomyCustomMock(ps.mib.w, # experimental mock community phyloseq
+                                   mock_db = MIBTrainingSet, # custome training set  
+                                   processors = NULL,
+                                   threshold = 60,
+                                   strand = "top",
+                                   verbose = FALSE)
+
+```
+
+## Aggregate to species  
+
+```{r exp-species} 
+
+ps.mib <- aggregate_taxa(ps.mib, "species")
+taxa_names(ps.mib)
+
+# convert to relative abundance  
+ps.mib <- microbiome::transform(ps.mib, "compositional")
+
+```
+
+## Merge with theoretical
+```{r merge-th-exp}
+
+# There is one sampe here
+phyloseq::sample_data(ps.th)$MockType <- "Theoretical"
+
+# adding new column to ps.mck.nw.tax may be for other comparisons user might be interested in doing.
+phyloseq::sample_data(ps.mib)$MockType <- "Experimental"
+
+
+ps.custom <- merge_phyloseq(ps.mib, ps.th)
+```
+
+
+Compare the experimental mocks with theoretical mocks 3 
+```{r}
+compare2theorectical(ps.custom,  theoretical_id = "MC3")
+```
+
+
+Visualize  
+```{r viz-cor-1}
+cor.table.ref <-compare2theorectical(ps.custom, theoretical = NULL) %>% 
+  corrr::focus(MC3)
+
+cor.table.ref %>% 
+  reshape2::melt() %>% 
+  # Remove MC4 theoretical and experimental and keep only those with MC3
+  dplyr::filter(!term %in% c("Lib1_Mock_4", "Lib2_Mock_4", "Lib3_Mock_4", "MC4") &
+                  variable == "MC3") %>% 
+  ggplot(aes(value,term)) +
+  geom_col(fill="steelblue") +
+  theme_minimal() +
+  #facet_grid(~variable) +
+  ylab("Experimental Mocks") +
+  xlab("Spearman correlation") +
+  #scale_fill_viridis_c() +
+  ggtitle("Species level correlation") + 
+  scale_x_continuous()
+
+```
+
+This is an example where one can observe that in high diversity mocks with some closely related "species", the assignments based on short reads is difficult. The correlation values are less than 0.5.   
+
+## Aggregate to Genus  
+It is well known that the Genus level assignments with short reads is better than "species" level assignments. Therefore, we can check the correlation at genus level.  
+```{r alll-genus}
+
+ps.custom.gen <- microbiome::aggregate_taxa(ps.custom, "genus")
+
+```
+
+
+```{r comp-genus-mc3}
+compare2theorectical(ps.custom.gen,  theoretical_id = "MC3")
+
+```
+
+
+Compare the values for MC3  
+```{r viz-cor-2}
+cor.table.ref <-compare2theorectical(ps.custom.gen, theoretical = NULL) %>% 
+  corrr::focus(MC3)
+
+cor.table.ref %>% 
+  reshape2::melt() %>% 
+  # Remove MC4 theoretical and experimental and keep only those with MC3
+  dplyr::filter(!term %in% c("Lib1_Mock_4", "Lib2_Mock_4", "Lib3_Mock_4", "MC4") &
+                  variable == "MC3") %>% 
+  ggplot(aes(value,term)) +
+  geom_col(fill="steelblue") +
+  theme_minimal() +
+  #facet_grid(~variable) +
+  ylab("Experimental Mocks") +
+  xlab("Spearman correlation") +
+  #scale_fill_viridis_c() +
+  ggtitle("Genus level correlation") +
+  scale_x_continuous()
+
+```
+
+Compare the values for MC4  
+```{r viz-cor-3}
+cor.table.ref <-compare2theorectical(ps.custom.gen, theoretical = NULL) %>% 
+  corrr::focus(MC4)
+
+cor.table.ref %>% 
+  reshape2::melt() %>% 
+  # Remove MC4 theoretical and experimental and keep only those with MC3
+  dplyr::filter(!term %in% c("Lib1_Mock_3", "Lib2_Mock_3", "Lib3_Mock_3", "MC3") &
+                  variable == "MC4") %>% 
+  ggplot(aes(value,term)) +
+  geom_col(fill="steelblue") +
+  theme_minimal() +
+  #facet_grid(~variable) +
+  ylab("Experimental Mocks") +
+  xlab("Spearman correlation") +
+  #scale_fill_viridis_c() +
+  ggtitle("Genus level correlation") +
+  scale_x_continuous()
+
+```
+
+There is a major improvement in correlation between theoretical and expected mock communities.  
+
+```{r eval=FALSE}
+devtools::session_info()
+```
+
+
