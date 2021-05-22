@@ -128,8 +128,8 @@ ggplot(sp.df, aes(Sample, Abundance)) +
       ggplot2::xlab("Samples")
 
 ```
-The lowest dilution, D8 has 80% non-ZymoBiomics taxa, so make sure you have negative controls and check the article by Karstens L, et al. [Controlling for contaminants in low-biomass 16S rRNA gene sequencing experiments](https://doi.org/10.1128/mSystems.00290-19). mSystems 4:e00290-19. All codes from their analysis are available openly. 
-Note: The taxonomy of lactobacilli has been updated from _L. fermentum_ is _Limosilactobacillus_  [Zheng J., Wittouck S., Salvetti E. et al.,(2020). A taxonomic note on the genus _Lactobacillus_: Description of 23 novel genera, emended description of the genus _Lactobacillus_ Beijerink 1901, and union of _Lactobacillaceae_ and _Leuconostocaceae_.](https://doi.org/10.1099/ijsem.0.004107)   
+The lowest dilution, D8 has 80% non-ZymoBiomics taxa, so make sure you have negative controls and check the article by Karstens L, et al. [Controlling for contaminants in low-biomass 16S rRNA gene sequencing experiments](https://doi.org/10.1128/mSystems.00290-19). mSystems 4:e00290-19. All codes from their analysis are available openly.   
+Note: The taxonomy of lactobacilli has been updated from _L. fermentum_ to _Limosilactobacillus_  [Zheng J., Wittouck S., Salvetti E. et al.,(2020). A taxonomic note on the genus _Lactobacillus_: Description of 23 novel genera, emended description of the genus _Lactobacillus_ Beijerink 1901, and union of _Lactobacillaceae_ and _Leuconostocaceae_.](https://doi.org/10.1099/ijsem.0.004107)   
 Thanks to [Giovanna Felis](https://twitter.com/FelisGiovanna) for bringing this to my notice on twitter.  
 The label for _L. fermentum_ is still being used by ZymoBiomics and will keep it as it is for now.  
 
