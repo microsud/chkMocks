@@ -1,3 +1,7 @@
+# chkMocks 0.1.02
+ 
+* Added an Zymo Gut trainingset and phyloseq. 
+
 # chkMocks 0.1.0
 
 * Minor fixes to vignettes. 

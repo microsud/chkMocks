@@ -133,6 +133,18 @@ Note: The taxonomy of lactobacilli has been updated from _L. fermentum_ to _Limo
 Thanks to [Giovanna Felis](https://twitter.com/FelisGiovanna) for bringing this to my notice on twitter.  
 The label for _L. fermentum_ is still being used by ZymoBiomics and will keep it as it is for now.  
 
+A training set and phyloseq object with theoretical composition of ZymoBIOMICS® Gut Microbiome Standard Catalog No. D6331 is also made available.  
+
+```{r}
+data(ZymoBiomicsGutTrainingSet)
+ZymoBiomicsGutTrainingSet
+```
+```{r}
+data(ZymoBiomicsGutPseq)
+ZymoBiomicsGutPseq
+```
+
+
 **Other independently developed tools that are:**     
 ZymoResearch [miqScore16SPublic](https://github.com/Zymo-Research/miqScore16SPublic) by [Michael Weinstein](https://twitter.com/bionomicon)   
 QIIME2 [q2-quality-control](https://github.com/qiime2/q2-quality-control) suggested by [Yanxian Li](https://twitter.com/li_yanxian)   

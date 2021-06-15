@@ -143,6 +143,39 @@ NULL
 #' Shetty SA 2021
 NULL
 
+#' @title ZymoBiomicsGutPseq
+#'
+#' @description Theoretical 16S composition of ZymoBIOMICS Microbial Community Standard.
+#'
+#' @details ZymoBiomicsGutPseq contains the \emph{theoretical} 16S composition of
+#'          ZymoBIOMICS Gut Microbial Community Standard. One sample, 19 known taxa and 7
+#'          taxonomic ranks.
+#'
+#' @name ZymoBiomicsGutPseq
+#'
+#' @docType data
+#'
+#' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
+#'
+#' @usage data(ZymoBiomicsGutPseq)
+#'
+#' @return Loads the data set in R.
+#'
+#' @format Phyloseq object
+#'
+#' @keywords Data
+#'
+#' @references
+#' \itemize{
+#' \item{}{ZymoBIOMICS® Gut Microbiome Standard.
+#'        \emph{Catalog No. D6331.
+#'        \url{https://files.zymoresearch.com/protocols/_d6331_zymobiomics_gut_microbiome_standard.pdf}
+#' }
+#' }
+#' }
+#' Shetty SA 2021
+NULL
+
 #' @title ZymoTrainingSet
 #'
 #' @description Contains ZymoTrainingSet compatible with DECIPHER::IdTaxa.
@@ -182,3 +215,67 @@ NULL
 #' Shetty SA 2021
 NULL
 
+#' @title ZymoBiomicsGutTrainingSet
+#'
+#' @description Contains ZymoBiomicsGutTrainingSet compatible with DECIPHER::IdTaxa.
+#'
+#' @details ZymoBiomicsGutTrainingSet contains 16S sequences of
+#'          ZymoBIOMICS Gut Microbial Community Standard Catalog No. D6331.
+#'
+#' @name ZymoBiomicsGutTrainingSet
+#'
+#' @docType data
+#'
+#' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
+#'
+#' @usage data(ZymoBiomicsGutTrainingSet)
+#'
+#' @return Loads the data set in R.
+#'
+#' @format TrainingSet object
+#'
+#' @keywords Data
+#'
+#' @references
+#' \itemize{
+#' \item{}{ZymoBIOMICS® Gut Microbiome Standard.
+#'        \emph{Catalog No. D6331.
+#'        \url{https://files.zymoresearch.com/protocols/_d6331_zymobiomics_gut_microbiome_standard.pdf}
+#' }
+#' }
+#' }
+#' Shetty SA 2021
+NULL
+
+#' @title ZymoBiomicsGut
+#'
+#' @description Contains ZymoBiomicsGut compatible with DECIPHER::IdTaxa.
+#'
+#' @details ZymoBiomicsGut contains table with information on strains and thier
+#'          abundances ZymoBIOMICS Gut Microbial Community Standard Catalog
+#'          No. D6331.
+#'
+#' @name ZymoBiomicsGut
+#'
+#' @docType data
+#'
+#' @author Sudarshan Shetty \email{sudarshanshetty9@gmail.com}
+#'
+#' @usage data(ZymoBiomicsGut)
+#'
+#' @return Loads the data set in R.
+#'
+#' @format Table
+#'
+#' @keywords Data
+#'
+#' @references
+#' \itemize{
+#' \item{}{ZymoBIOMICS® Gut Microbiome Standard.
+#'        \emph{Catalog No. D6331.
+#'        \url{https://files.zymoresearch.com/protocols/_d6331_zymobiomics_gut_microbiome_standard.pdf}
+#' }
+#' }
+#' }
+#' Shetty SA 2021
+NULL
