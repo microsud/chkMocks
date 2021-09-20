@@ -60,6 +60,7 @@ checkZymoBiomics <- function(x,
 
   nw_x <- .get_species_comp(new_tx)
 
+  colnames(phyloseq::tax_table(nw_x)) <- .firstup(phyloseq::rank_names(nw_x))
   # merge with theoretical
   phyloseq::sample_data(ZymoBiomicsPseq)$ZymoType <- "Theoretical"
   phyloseq::sample_data(nw_x)$ZymoType <- "UserSamples"
@@ -157,3 +158,8 @@ checkZymoBiomics <- function(x,
 }
 
 
+#https://stackoverflow.com/questions/18509527/first-letter-to-upper-case
+.firstup <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}

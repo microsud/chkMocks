@@ -120,7 +120,7 @@ In the diluted mock samples, there are `Unknown` taxa i.e. those that are not of
 Check for their contribution.  
 ```{r fig.width=6, fig.height=4}
 sp.df <- phyloseq::psmelt(ps_species) %>%
-  dplyr::filter(species=="Unknown" & Sample !="ZymoTheoretical")
+  dplyr::filter(Species=="Unknown" & Sample !="ZymoTheoretical")
 
 ggplot(sp.df, aes(Sample, Abundance)) + 
   geom_col() + theme_minimal() +
@@ -139,6 +139,7 @@ A training set and phyloseq object with theoretical composition of ZymoBIOMICS®
 data(ZymoBiomicsGutTrainingSet)
 ZymoBiomicsGutTrainingSet
 ```
+
 ```{r}
 data(ZymoBiomicsGutPseq)
 ZymoBiomicsGutPseq
