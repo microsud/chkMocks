@@ -15,8 +15,10 @@ install_github("microsud/chkMocks")
 
 ```
 
-
 The support for Non-Zymo Mock communities is experimental.  
+
+### Cite  
+Shetty SA. (2022). chkMocks: An R Package to Compare Mock Community Samples in Microbiome Amplicon Sequencing Studies (0.1.03). Zenodo. https://doi.org/10.5281/zenodo.6951522
 
 ### Acknowledgments        
 
