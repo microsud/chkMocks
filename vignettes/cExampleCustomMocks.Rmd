@@ -19,7 +19,6 @@ comment = "#>"
 In this examples, the step to work with custom mock communities is demonstrated.  
 The test data used in this example are from Ramiro-Garcia J, Hermes GDA, Giatsis C et al. [NG-Tax, a highly accurate and validated pipeline for analysis of 16S rRNA amplicons from complex biomes F1000Research 2018, 5:1791](https://doi.org/10.12688/f1000research.9227.2) [version 2; peer review: 2 approved, 1 approved with reservations, 1 not approved].  
 
-
 How to prepare a custom training set for `DECIPHER::IdTaxa`?  
 These are from the [DECIPHER](https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf) package.  
 
@@ -200,7 +199,7 @@ head(mck.otu)
 ```
 The matrix above can be convert to otu_table later.  
 
-Now create a dummy `sample_ _data` table.   
+Now create a dummy `sample_data` table.   
 ```{r mk-sam}
 # SampleType here is label that should match one of your columns in sample_data in experimental samples phyloseq object.
 mck.sam <- data.frame(row.names = c(colnames(mck.otu)),
@@ -247,7 +246,7 @@ sample_names(ps.th)
 ## Check composition of theoretical    
 
 ```{r th-gen}
-ps.th.genus <- aggregate_taxa(ps.th, "Genus")
+ps.th.genus <- microbiome::aggregate_taxa(ps.th, "Genus")
 plot_composition(ps.th.genus) + 
   theme_minimal() +
   theme(legend.position="right",
@@ -340,8 +339,7 @@ cor.table.ref %>%
   theme_minimal() +
   #facet_grid(~variable) +
   ylab("Experimental Mocks") +
-  xlab("Spearman correlation") +
-  #scale_fill_viridis_c() +
+  xlab("Spearman's correlation") +
   ggtitle("Species level correlation") + 
   scale_x_continuous()
 

@@ -28,10 +28,12 @@
 plotZymoDefault <- function(x){
 
   ZymoTheoretical <- abundance <- sample.chkmks <- chk.names <- FeatureID <- NULL
-  if(class(x)=="list"
-     && class(x[[1]])=="phyloseq"
-     && class(x[[2]])=="phyloseq"
-     && class(x[[3]])[3]=="data.frame") {
+
+  #is(x, "phyloseq")
+  if(is(x, "list")
+     && is(x[[1]], "phyloseq")
+     && is(x[[2]], "phyloseq")
+     && is(x[[3]], "tbl_df")) {
 
 
     ldf <- .get_long_tib(x$ps_species)
@@ -57,7 +59,7 @@ plotZymoDefault <- function(x){
                   Escherichia.coli="#0072B2",
                   Salmonella.enterica="#EC6E0B",
                   Pseudomonas.aeruginosa="#C1066E",
-                  na.value = "#bababa",
+                  #na.value = "#bababa",
                   Unknown = "#bababa"
 
     )
@@ -79,7 +81,7 @@ plotZymoDefault <- function(x){
       ggplot2::geom_col(ggplot2::aes(fill=ZymoTheoretical)) +
       ggplot2::xlab("Spearman's Correlation \nwith Theoretical") +
       ggplot2::theme_bw() +
-      ggplot2::scale_fill_viridis_c("Pearson's Correlation") +
+      ggplot2::scale_fill_viridis_c("Spearman's Correlation") +
       ggplot2::theme(axis.text.y = ggplot2::element_blank(),
                      axis.ticks.y = ggplot2::element_blank(),
                      axis.title.y = ggplot2::element_blank(),

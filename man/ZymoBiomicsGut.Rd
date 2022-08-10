@@ -17,7 +17,7 @@ Loads the data set in R.
 Contains ZymoBiomicsGut compatible with DECIPHER::IdTaxa.
 }
 \details{
-ZymoBiomicsGut contains table with information on strains and thier
+ZymoBiomicsGut contains table with information on strains and their
          abundances ZymoBIOMICS Gut Microbial Community Standard Catalog
          No. D6331.
 }

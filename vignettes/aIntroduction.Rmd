@@ -19,7 +19,6 @@ Look at your mocks...
 Every microbiome sequencing experiment must have a positive control. However, how do we make use of these mock controls to guide our quality check is not easily available. A basic question to asks, _Is the composition in experimental mock standards similar to theoretical expected composition?_    
 We can visually compare the composition bar-plots and check for correlation between experimental and theoretical community composition.  
 `chkMocks` eases these basic comparisons.  
-Note: Currently, only `ZymoBiomics` mocks are supported and we are working on adding support for custom databases. 
 
 **Install** 
 ```{r eval=FALSE}

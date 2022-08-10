@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">chkMocks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.03</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.03</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/microsud/chkMocks/">
+  <a href="https://github.com/microsud/chkMocks/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -85,498 +81,533 @@
 
       
 
-      </header><script src="cExampleCustomMocks_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Working with custom mocks</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/microsud/chkMocks/blob/master/vignettes/cExampleCustomMocks.Rmd"><code>vignettes/cExampleCustomMocks.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/microsud/chkMocks/blob/HEAD/vignettes/cExampleCustomMocks.Rmd" class="external-link"><code>vignettes/cExampleCustomMocks.Rmd</code></a></small>
       <div class="hidden name"><code>cExampleCustomMocks.Rmd</code></div>
 
     </div>
 
     
     
-<p>In this examples, the step to work with custom mock communities is demonstrated.<br>
-The test data used in this example are from Ramiro-Garcia J, Hermes GDA, Giatsis C et al. <a href="https://doi.org/10.12688/f1000research.9227.2">NG-Tax, a highly accurate and validated pipeline for analysis of 16S rRNA amplicons from complex biomes F1000Research 2018, 5:1791</a> [version 2; peer review: 2 approved, 1 approved with reservations, 1 not approved].</p>
-<p>How to prepare a custom training set for <code><a href="https://rdrr.io/pkg/DECIPHER/man/IdTaxa.html">DECIPHER::IdTaxa</a></code>?<br>
-These are from the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf">DECIPHER</a> package.</p>
-<div id="library" class="section level1">
-<h1 class="hasAnchor">
-<a href="#library" class="anchor"></a>Library</h1>
+<p>In this examples, the step to work with custom mock communities is
+demonstrated.<br>
+The test data used in this example are from Ramiro-Garcia J, Hermes GDA,
+Giatsis C et al. <a href="https://doi.org/10.12688/f1000research.9227.2" class="external-link">NG-Tax, a highly
+accurate and validated pipeline for analysis of 16S rRNA amplicons from
+complex biomes F1000Research 2018, 5:1791</a> [version 2; peer review: 2
+approved, 1 approved with reservations, 1 not approved].</p>
+<p>How to prepare a custom training set for
+<code><a href="https://rdrr.io/pkg/DECIPHER/man/IdTaxa.html" class="external-link">DECIPHER::IdTaxa</a></code>?<br>
+These are from the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf" class="external-link">DECIPHER</a>
+package.</p>
+<div class="section level2">
+<h2 id="library">Library<a class="anchor" aria-label="anchor" href="#library"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Following packages are required  </span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/microsud/chkMocks">chkMocks</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">DECIPHER</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://microbiome.github.io/microbiome">microbiome</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/corrr">corrr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/Biostrings">Biostrings</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hadley/reshape">reshape2</a></span><span class="op">)</span></code></pre></div>
-<p>Read the fasta file with 16S rRNA gene sequences for taxa in mock community.</p>
+<code class="sourceCode R"><span><span class="co"># Following packages are required  </span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/microsud/chkMocks" class="external-link">chkMocks</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DECIPHER</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://microbiome.github.io/microbiome" class="external-link">microbiome</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/corrr" class="external-link">corrr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bioconductor.org/packages/Biostrings" class="external-link">Biostrings</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hadley/reshape" class="external-link">reshape2</a></span><span class="op">)</span></span></code></pre></div>
+<p>Read the fasta file with 16S rRNA gene sequences for taxa in mock
+community.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># db &lt;- "../MIBMocks/MIBPhylotypes.fasta" # path of custom fasta sequences </span>
-
-<span class="co"># Here example is store in the package.</span>
-<span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"MIBPhylotypes.fasta"</span>,
-                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># db &lt;- "../MIBMocks/MIBPhylotypes.fasta" # path of custom fasta sequences </span></span>
+<span></span>
+<span><span class="co"># Here example is store in the package.</span></span>
+<span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"MIBPhylotypes.fasta"</span>,</span>
+<span>                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Convert to <code>DNAStringSet</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">Biostrings</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Biostrings/man/XStringSet-io.html">readDNAStringSet</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span>
-<span class="co">#&gt; Warning in .Call2("fasta_index", filexp_list, nrec, skip, seek.first.rec, :</span>
-<span class="co">#&gt; reading FASTA file C:/Users/shettys/Documents/R/win-library/4.1/chkMocks/</span>
-<span class="co">#&gt; extdata/MIBPhylotypes.fasta: ignored 2 invalid one-letter sequence codes</span>
-<span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">DECIPHER</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/OrientNucleotides.html">OrientNucleotides</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span>
-<span class="co">#&gt; ========================================================================================================================================================================================================</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; Time difference of 0.1 secs</span>
-<span class="co"># check first 2 as example</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>
-<span class="co">#&gt; [1] "Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Nocardiaceae;Rhodococcus;Rhodococcus.1_PT;"  </span>
-<span class="co">#&gt; [2] "Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Micrococcaceae;Micrococcus;Micrococcus.2_PT;"</span></code></pre></div>
-<p>Now, adding the dummy seq name before &gt; and adding a ‘Root’ before Bacteria;Phylum;etc;</p>
+<code class="sourceCode R"><span></span>
+<span><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">Biostrings</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Biostrings/man/XStringSet-io.html" class="external-link">readDNAStringSet</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in .Call2("fasta_index", filexp_list, nrec, skip, seek.first.rec, :</span></span>
+<span><span class="co">#&gt; reading FASTA file C:/Users/shettys/AppData/Local/R/win-library/4.2/chkMocks/</span></span>
+<span><span class="co">#&gt; extdata/MIBPhylotypes.fasta: ignored 2 invalid one-letter sequence codes</span></span>
+<span><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">DECIPHER</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/OrientNucleotides.html" class="external-link">OrientNucleotides</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; ========================================================================================================================================================================================================</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Time difference of 0.11 secs</span></span>
+<span><span class="co"># check first 2 as example</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] "Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Nocardiaceae;Rhodococcus;Rhodococcus.1_PT;"  </span></span>
+<span><span class="co">#&gt; [2] "Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Micrococcaceae;Micrococcus;Micrococcus.2_PT;"</span></span></code></pre></div>
+<p>Now, adding the dummy seq name before &gt; and adding a ‘Root’ before
+Bacteria;Phylum;etc;</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># here, adding the dummy seq name before &gt; and adding a 'Root' before Bacteria;Phylum;etc;</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"MIB"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="st">" "</span>, <span class="st">"Root;"</span> ,<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># check first 2 as example</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>
-<span class="co">#&gt; [1] "MIB1 Root;Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Nocardiaceae;Rhodococcus;Rhodococcus.1_PT;"  </span>
-<span class="co">#&gt; [2] "MIB2 Root;Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Micrococcaceae;Micrococcus;Micrococcus.2_PT;"</span></code></pre></div>
-<p>We show how to check for problematic taxonomies. However, it will most likely be not required if input fasta is formatted correctly.</p>
+<code class="sourceCode R"><span><span class="co"># here, adding the dummy seq name before &gt; and adding a 'Root' before Bacteria;Phylum;etc;</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"MIB"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="st">" "</span>, <span class="st">"Root;"</span> ,<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># check first 2 as example</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] "MIB1 Root;Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Nocardiaceae;Rhodococcus;Rhodococcus.1_PT;"  </span></span>
+<span><span class="co">#&gt; [2] "MIB2 Root;Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Micrococcaceae;Micrococcus;Micrococcus.2_PT;"</span></span></code></pre></div>
+<p>We show how to check for problematic taxonomies. However, it will
+most likely be not required if input fasta is formatted correctly.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="co"># sequence names</span>
-<span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">"(.*)(Root;)"</span>, <span class="st">"\\2"</span>, <span class="va">groups</span><span class="op">)</span>
-<span class="va">groupCounts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>
-<span class="va">u_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">groupCounts</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">u_groups</span><span class="op">)</span>
-<span class="va">maxGroupSize</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># max sequences per label (&gt;= 1)</span>
-<span class="va">remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html">logical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="co"># sequence names</span></span>
+<span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"(.*)(Root;)"</span>, <span class="st">"\\2"</span>, <span class="va">groups</span><span class="op">)</span></span>
+<span><span class="va">groupCounts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span></span>
+<span><span class="va">u_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groupCounts</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">u_groups</span><span class="op">)</span></span>
+<span><span class="va">maxGroupSize</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># max sequences per label (&gt;= 1)</span></span>
+<span><span class="va">remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Create a training set.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">maxIterations</span> <span class="op">&lt;-</span> <span class="fl">3</span>
-<span class="va">allowGroupRemoval</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>
-<span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">integer</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">groupCounts</span> <span class="op">&gt;</span> <span class="va">maxGroupSize</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">groups</span><span class="op">==</span><span class="va">u_groups</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
-  <span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">index</span><span class="op">)</span>,
-                 <span class="va">maxGroupSize</span><span class="op">)</span>
-  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="op">-</span><span class="va">keep</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span>
-
-<span class="va">taxid</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">maxIterations</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Training iteration: "</span>, <span class="va">i</span>, <span class="st">"\n"</span>, sep<span class="op">=</span><span class="st">""</span><span class="op">)</span>
-  <span class="co"># train the classifier</span>
-  <span class="va">MIBTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/LearnTaxa.html">LearnTaxa</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,
-                              <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,
-                              <span class="va">taxid</span><span class="op">)</span>
-  <span class="co"># look for problem sequences</span>
-  <span class="va">probSeqs</span> <span class="op">&lt;-</span> <span class="va">MIBTrainingSet</span><span class="op">$</span><span class="va">problemSequences</span><span class="op">$</span><span class="va">Index</span> 
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"No problem sequences remaining.\n"</span><span class="op">)</span>
-    <span class="kw">break</span>
-  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">)</span> <span class="op">&amp;&amp;</span>
-             <span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">==</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Iterations converged.\n"</span><span class="op">)</span>
-    <span class="kw">break</span>
-  <span class="op">}</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span><span class="op">==</span><span class="va">maxIterations</span><span class="op">)</span>
-    <span class="kw">break</span>
-  <span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="va">probSeqs</span>
-  <span class="co"># remove any problem sequences</span>
-  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">remove</span><span class="op">)</span><span class="op">[</span><span class="va">probSeqs</span><span class="op">]</span>
-  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># remove all problem sequences</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">allowGroupRemoval</span><span class="op">)</span> <span class="op">{</span>
-    <span class="co"># replace any removed groups</span>
-    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">(</span><span class="va">u_groups</span> <span class="op">%in%</span> <span class="va">groups</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span><span class="op">)</span>
-    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="va">u_groups</span><span class="op">[</span><span class="va">missing</span><span class="op">]</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">missing</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">index</span> <span class="op">&lt;-</span> <span class="va">index</span><span class="op">[</span><span class="va">groups</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">%in%</span> <span class="va">missing</span><span class="op">]</span>
-      <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># don't remove</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">maxIterations</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
+<span><span class="va">allowGroupRemoval</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">groupCounts</span> <span class="op">&gt;</span> <span class="va">maxGroupSize</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">groups</span><span class="op">==</span><span class="va">u_groups</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">index</span><span class="op">)</span>,</span>
+<span>                 <span class="va">maxGroupSize</span><span class="op">)</span></span>
+<span>  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="op">-</span><span class="va">keep</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">taxid</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">maxIterations</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Training iteration: "</span>, <span class="va">i</span>, <span class="st">"\n"</span>, sep<span class="op">=</span><span class="st">""</span><span class="op">)</span></span>
+<span>  <span class="co"># train the classifier</span></span>
+<span>  <span class="va">MIBTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/LearnTaxa.html" class="external-link">LearnTaxa</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,</span>
+<span>                              <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,</span>
+<span>                              <span class="va">taxid</span><span class="op">)</span></span>
+<span>  <span class="co"># look for problem sequences</span></span>
+<span>  <span class="va">probSeqs</span> <span class="op">&lt;-</span> <span class="va">MIBTrainingSet</span><span class="op">$</span><span class="va">problemSequences</span><span class="op">$</span><span class="va">Index</span> </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No problem sequences remaining.\n"</span><span class="op">)</span></span>
+<span>    <span class="kw">break</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span>             <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">==</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Iterations converged.\n"</span><span class="op">)</span></span>
+<span>    <span class="kw">break</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span><span class="op">==</span><span class="va">maxIterations</span><span class="op">)</span></span>
+<span>    <span class="kw">break</span></span>
+<span>  <span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="va">probSeqs</span></span>
+<span>  <span class="co"># remove any problem sequences</span></span>
+<span>  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">remove</span><span class="op">)</span><span class="op">[</span><span class="va">probSeqs</span><span class="op">]</span></span>
+<span>  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># remove all problem sequences</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">allowGroupRemoval</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># replace any removed groups</span></span>
+<span>    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">(</span><span class="va">u_groups</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">groups</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="va">u_groups</span><span class="op">[</span><span class="va">missing</span><span class="op">]</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">missing</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">index</span> <span class="op">&lt;-</span> <span class="va">index</span><span class="op">[</span><span class="va">groups</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="va">missing</span><span class="op">]</span></span>
+<span>      <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># don't remove</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>Check any problems.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># saveRDS(MIBTrainingSet, "inst/extdata/MIBTrainingSet.rds")</span>
-<span class="co"># Here MIBTrainingSet is stored in the package to reduce time for example.</span>
-<span class="co"># Read data from package</span>
-<span class="va">MIBTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"MIBTrainingSet.rds"</span>,
-                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#path for file</span>
-<span class="va">MIBTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="va">MIBTrainingSet</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># saveRDS(MIBTrainingSet, "inst/extdata/MIBTrainingSet.rds")</span></span>
+<span><span class="co"># Here MIBTrainingSet is stored in the package to reduce time for example.</span></span>
+<span><span class="co"># Read data from package</span></span>
+<span><span class="va">MIBTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"MIBTrainingSet.rds"</span>,</span>
+<span>                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#path for file</span></span>
+<span><span class="va">MIBTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">MIBTrainingSet</span><span class="op">)</span></span></code></pre></div>
 <p>Check training set.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">MIBTrainingSet</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">MIBTrainingSet</span><span class="op">)</span></span></code></pre></div>
 <p><img src="cExampleCustomMocks_files/figure-html/plot-training-1.png" width="3000"></p>
 <p>Check training set.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Problem seqs in reference?</span>
-<span class="va">MIBTrainingSet</span><span class="op">$</span><span class="va">problemSequences</span>
-<span class="co">#&gt;   Index</span>
-<span class="co">#&gt; 1    16</span>
-<span class="co">#&gt;                                                                                              Expected</span>
-<span class="co">#&gt; 1 Root;Bacteria;Bacteroidetes;Bacteroidia;Bacteroidales;Bacteroidaceae;Bacteroides;Bacteroides.16_PT;</span>
-<span class="co">#&gt;                                                                                             Predicted</span>
-<span class="co">#&gt; 1 Root;Bacteria;Bacteroidetes;Bacteroidia;Bacteroidales;Bacteroidaceae;Bacteroides;Bacteroides.11_PT;</span>
-<span class="co"># Which is the problem group</span>
-<span class="va">MIBTrainingSet</span><span class="op">$</span><span class="va">problemGroups</span>
-<span class="co">#&gt; [1] "Root;Bacteria;Bacteroidetes;Bacteroidia;Bacteroidales;Bacteroidaceae;Bacteroides;"</span></code></pre></div>
-<p><code>Bacteroides</code> seqs are highlighted here. These are common gut inhabitants. Closely related <code>Bacteroides</code> can be difficult to assign taxonomy at lowere levels.</p>
-<p>There is <code>N</code> in some of the reference sequences and therefore it is highlighted.</p>
-<div id="create-theoretical-phyloseq" class="section level2">
-<h2 class="hasAnchor">
-<a href="#create-theoretical-phyloseq" class="anchor"></a>Create theoretical Phyloseq</h2>
-<div id="get-theoretical-composition-mibmocks" class="section level3">
-<h3 class="hasAnchor">
-<a href="#get-theoretical-composition-mibmocks" class="anchor"></a>Get theoretical Composition MIBMocks</h3>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Problem seqs in reference?</span></span>
+<span><span class="va">MIBTrainingSet</span><span class="op">$</span><span class="va">problemSequences</span></span>
+<span><span class="co">#&gt;   Index</span></span>
+<span><span class="co">#&gt; 1    16</span></span>
+<span><span class="co">#&gt;                                                                                              Expected</span></span>
+<span><span class="co">#&gt; 1 Root;Bacteria;Bacteroidetes;Bacteroidia;Bacteroidales;Bacteroidaceae;Bacteroides;Bacteroides.16_PT;</span></span>
+<span><span class="co">#&gt;                                                                                             Predicted</span></span>
+<span><span class="co">#&gt; 1 Root;Bacteria;Bacteroidetes;Bacteroidia;Bacteroidales;Bacteroidaceae;Bacteroides;Bacteroides.11_PT;</span></span>
+<span></span>
+<span><span class="co"># Which is the problem group</span></span>
+<span><span class="va">MIBTrainingSet</span><span class="op">$</span><span class="va">problemGroups</span></span>
+<span><span class="co">#&gt; [1] "Root;Bacteria;Bacteroidetes;Bacteroidia;Bacteroidales;Bacteroidaceae;Bacteroides;"</span></span></code></pre></div>
+<p><code>Bacteroides</code> seqs are highlighted here. These are common
+gut inhabitants. Closely related <code>Bacteroides</code> can be
+difficult to assign taxonomy at lowere levels.</p>
+<p>There is <code>N</code> in some of the reference sequences and
+therefore it is highlighted.</p>
+<div class="section level3">
+<h3 id="create-theoretical-phyloseq">Create theoretical Phyloseq<a class="anchor" aria-label="anchor" href="#create-theoretical-phyloseq"></a>
+</h3>
+<div class="section level4">
+<h4 id="get-theoretical-composition-mibmocks">Get theoretical Composition MIBMocks<a class="anchor" aria-label="anchor" href="#get-theoretical-composition-mibmocks"></a>
+</h4>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># mck.otu.th.path &lt;- read.csv("../MIBMocks/TheoreticalCompositionMIBMocks.csv") </span>
-
-<span class="co"># Here example is store in the package.</span>
-<span class="va">mck.otu.th.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"TheoreticalCompositionMIBMocks.csv"</span>,
-                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">mck.otu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="va">mck.otu.th.path</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span>
-<span class="co">#&gt;                Species  MC3   MC4</span>
-<span class="co">#&gt; 1     Rhodococcus.1_PT 1.16 0.001</span>
-<span class="co">#&gt; 2     Micrococcus.2_PT 1.16 0.010</span>
-<span class="co">#&gt; 3 Bifidobacterium.3_PT 1.16 0.100</span>
-<span class="co">#&gt; 4 Bifidobacterium.4_PT 1.16 2.490</span>
-<span class="co">#&gt; 5 Bifidobacterium.5_PT 1.16 0.000</span>
-<span class="co">#&gt; 6 Bifidobacterium.6_PT 1.16 0.000</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># mck.otu.th.path &lt;- read.csv("../MIBMocks/TheoreticalCompositionMIBMocks.csv") </span></span>
+<span></span>
+<span><span class="co"># Here example is store in the package.</span></span>
+<span><span class="va">mck.otu.th.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"TheoreticalCompositionMIBMocks.csv"</span>,</span>
+<span>                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">mck.otu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">mck.otu.th.path</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                Species  MC3   MC4</span></span>
+<span><span class="co">#&gt; 1     Rhodococcus.1_PT 1.16 0.001</span></span>
+<span><span class="co">#&gt; 2     Micrococcus.2_PT 1.16 0.010</span></span>
+<span><span class="co">#&gt; 3 Bifidobacterium.3_PT 1.16 0.100</span></span>
+<span><span class="co">#&gt; 4 Bifidobacterium.4_PT 1.16 2.490</span></span>
+<span><span class="co">#&gt; 5 Bifidobacterium.5_PT 1.16 0.000</span></span>
+<span><span class="co">#&gt; 6 Bifidobacterium.6_PT 1.16 0.000</span></span></code></pre></div>
 <p>The table above has theoretical composition.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># make Species col as rownames</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">mck.otu</span><span class="op">$</span><span class="va">Species</span>
-
-<span class="co"># Remove first col `Species` and convert it to a matrix</span>
-<span class="va">mck.otu</span> <span class="op">&lt;-</span> <span class="va">mck.otu</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="op">)</span> 
-
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span>
-<span class="co">#&gt;                       MC3   MC4</span>
-<span class="co">#&gt; Rhodococcus.1_PT     1.16 0.001</span>
-<span class="co">#&gt; Micrococcus.2_PT     1.16 0.010</span>
-<span class="co">#&gt; Bifidobacterium.3_PT 1.16 0.100</span>
-<span class="co">#&gt; Bifidobacterium.4_PT 1.16 2.490</span>
-<span class="co">#&gt; Bifidobacterium.5_PT 1.16 0.000</span>
-<span class="co">#&gt; Bifidobacterium.6_PT 1.16 0.000</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># make Species col as rownames</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">mck.otu</span><span class="op">$</span><span class="va">Species</span></span>
+<span></span>
+<span><span class="co"># Remove first col `Species` and convert it to a matrix</span></span>
+<span><span class="va">mck.otu</span> <span class="op">&lt;-</span> <span class="va">mck.otu</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                       MC3   MC4</span></span>
+<span><span class="co">#&gt; Rhodococcus.1_PT     1.16 0.001</span></span>
+<span><span class="co">#&gt; Micrococcus.2_PT     1.16 0.010</span></span>
+<span><span class="co">#&gt; Bifidobacterium.3_PT 1.16 0.100</span></span>
+<span><span class="co">#&gt; Bifidobacterium.4_PT 1.16 2.490</span></span>
+<span><span class="co">#&gt; Bifidobacterium.5_PT 1.16 0.000</span></span>
+<span><span class="co">#&gt; Bifidobacterium.6_PT 1.16 0.000</span></span></code></pre></div>
 <p>The matrix above can be convert to otu_table later.</p>
-<p>Now create a dummy <code>sample_ _data</code> table.</p>
+<p>Now create a dummy <code>sample_data</code> table.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># SampleType here is label that should match one of your columns in sample_data in experimental samples phyloseq object.</span>
-<span class="va">mck.sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span><span class="op">)</span>,
-                      SampleType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"MyMockTheoretical"</span>,<span class="st">"MyMockTheoretical"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>  
-  <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html">sample_data</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">mck.sam</span>
-<span class="co">#&gt;            SampleType</span>
-<span class="co">#&gt; MC3 MyMockTheoretical</span>
-<span class="co">#&gt; MC4 MyMockTheoretical</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># SampleType here is label that should match one of your columns in sample_data in experimental samples phyloseq object.</span></span>
+<span><span class="va">mck.sam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mck.otu</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                      SampleType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MyMockTheoretical"</span>,<span class="st">"MyMockTheoretical"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html" class="external-link">sample_data</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">mck.sam</span></span>
+<span><span class="co">#&gt;            SampleType</span></span>
+<span><span class="co">#&gt; MC3 MyMockTheoretical</span></span>
+<span><span class="co">#&gt; MC4 MyMockTheoretical</span></span></code></pre></div>
 <p>Get the taxonomy for mock phylotype.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># mck.taxonomy.th.path &lt;- read.csv("../MIBMocks/TaxonomyMIBMocks.csv") </span>
-
-<span class="co"># Here example is store in the package.</span>
-<span class="va">mck.taxonomy.th.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"TaxonomyMIBMocks.csv"</span>,
-                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">mck.tax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html">read.csv</a></span><span class="op">(</span><span class="va">mck.taxonomy.th.path</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span>
-<span class="co">#&gt;     Domain         Phylum          Class             Order             Family</span>
-<span class="co">#&gt; 1 Bacteria Actinobacteria Actinobacteria   Actinomycetales       Nocardiaceae</span>
-<span class="co">#&gt; 2 Bacteria Actinobacteria Actinobacteria   Actinomycetales     Micrococcaceae</span>
-<span class="co">#&gt; 3 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span>
-<span class="co">#&gt; 4 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span>
-<span class="co">#&gt; 5 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span>
-<span class="co">#&gt; 6 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span>
-<span class="co">#&gt;             Genus              Species</span>
-<span class="co">#&gt; 1     Rhodococcus     Rhodococcus.1_PT</span>
-<span class="co">#&gt; 2     Micrococcus     Micrococcus.2_PT</span>
-<span class="co">#&gt; 3 Bifidobacterium Bifidobacterium.3_PT</span>
-<span class="co">#&gt; 4 Bifidobacterium Bifidobacterium.4_PT</span>
-<span class="co">#&gt; 5 Bifidobacterium Bifidobacterium.5_PT</span>
-<span class="co">#&gt; 6 Bifidobacterium Bifidobacterium.6_PT</span>
-<span class="fu"><a href="https://rdrr.io/r/base/colnames.html">rownames</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">mck.tax</span><span class="op">$</span><span class="va">Species</span>
-<span class="va">mck.tax</span> <span class="op">&lt;-</span> <span class="va">mck.tax</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">as.matrix</a></span><span class="op">(</span><span class="op">)</span> 
-
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span>
-<span class="co">#&gt;                      Phylum           Class            Order              </span>
-<span class="co">#&gt; Rhodococcus.1_PT     "Actinobacteria" "Actinobacteria" "Actinomycetales"  </span>
-<span class="co">#&gt; Micrococcus.2_PT     "Actinobacteria" "Actinobacteria" "Actinomycetales"  </span>
-<span class="co">#&gt; Bifidobacterium.3_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span>
-<span class="co">#&gt; Bifidobacterium.4_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span>
-<span class="co">#&gt; Bifidobacterium.5_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span>
-<span class="co">#&gt; Bifidobacterium.6_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span>
-<span class="co">#&gt;                      Family               Genus            </span>
-<span class="co">#&gt; Rhodococcus.1_PT     "Nocardiaceae"       "Rhodococcus"    </span>
-<span class="co">#&gt; Micrococcus.2_PT     "Micrococcaceae"     "Micrococcus"    </span>
-<span class="co">#&gt; Bifidobacterium.3_PT "Bifidobacteriaceae" "Bifidobacterium"</span>
-<span class="co">#&gt; Bifidobacterium.4_PT "Bifidobacteriaceae" "Bifidobacterium"</span>
-<span class="co">#&gt; Bifidobacterium.5_PT "Bifidobacteriaceae" "Bifidobacterium"</span>
-<span class="co">#&gt; Bifidobacterium.6_PT "Bifidobacteriaceae" "Bifidobacterium"</span>
-<span class="co">#&gt;                      Species               </span>
-<span class="co">#&gt; Rhodococcus.1_PT     "Rhodococcus.1_PT"    </span>
-<span class="co">#&gt; Micrococcus.2_PT     "Micrococcus.2_PT"    </span>
-<span class="co">#&gt; Bifidobacterium.3_PT "Bifidobacterium.3_PT"</span>
-<span class="co">#&gt; Bifidobacterium.4_PT "Bifidobacterium.4_PT"</span>
-<span class="co">#&gt; Bifidobacterium.5_PT "Bifidobacterium.5_PT"</span>
-<span class="co">#&gt; Bifidobacterium.6_PT "Bifidobacterium.6_PT"</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># mck.taxonomy.th.path &lt;- read.csv("../MIBMocks/TaxonomyMIBMocks.csv") </span></span>
+<span></span>
+<span><span class="co"># Here example is store in the package.</span></span>
+<span><span class="va">mck.taxonomy.th.path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"TaxonomyMIBMocks.csv"</span>,</span>
+<span>                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">mck.tax</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">mck.taxonomy.th.path</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span></span>
+<span><span class="co">#&gt;     Domain         Phylum          Class             Order             Family</span></span>
+<span><span class="co">#&gt; 1 Bacteria Actinobacteria Actinobacteria   Actinomycetales       Nocardiaceae</span></span>
+<span><span class="co">#&gt; 2 Bacteria Actinobacteria Actinobacteria   Actinomycetales     Micrococcaceae</span></span>
+<span><span class="co">#&gt; 3 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span></span>
+<span><span class="co">#&gt; 4 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span></span>
+<span><span class="co">#&gt; 5 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span></span>
+<span><span class="co">#&gt; 6 Bacteria Actinobacteria Actinobacteria Bifidobacteriales Bifidobacteriaceae</span></span>
+<span><span class="co">#&gt;             Genus              Species</span></span>
+<span><span class="co">#&gt; 1     Rhodococcus     Rhodococcus.1_PT</span></span>
+<span><span class="co">#&gt; 2     Micrococcus     Micrococcus.2_PT</span></span>
+<span><span class="co">#&gt; 3 Bifidobacterium Bifidobacterium.3_PT</span></span>
+<span><span class="co">#&gt; 4 Bifidobacterium Bifidobacterium.4_PT</span></span>
+<span><span class="co">#&gt; 5 Bifidobacterium Bifidobacterium.5_PT</span></span>
+<span><span class="co">#&gt; 6 Bifidobacterium Bifidobacterium.6_PT</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/BiocGenerics/man/row_colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">mck.tax</span><span class="op">$</span><span class="va">Species</span></span>
+<span><span class="va">mck.tax</span> <span class="op">&lt;-</span> <span class="va">mck.tax</span><span class="op">[</span>,<span class="op">-</span><span class="fl">1</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                      Phylum           Class            Order              </span></span>
+<span><span class="co">#&gt; Rhodococcus.1_PT     "Actinobacteria" "Actinobacteria" "Actinomycetales"  </span></span>
+<span><span class="co">#&gt; Micrococcus.2_PT     "Actinobacteria" "Actinobacteria" "Actinomycetales"  </span></span>
+<span><span class="co">#&gt; Bifidobacterium.3_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.4_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.5_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.6_PT "Actinobacteria" "Actinobacteria" "Bifidobacteriales"</span></span>
+<span><span class="co">#&gt;                      Family               Genus            </span></span>
+<span><span class="co">#&gt; Rhodococcus.1_PT     "Nocardiaceae"       "Rhodococcus"    </span></span>
+<span><span class="co">#&gt; Micrococcus.2_PT     "Micrococcaceae"     "Micrococcus"    </span></span>
+<span><span class="co">#&gt; Bifidobacterium.3_PT "Bifidobacteriaceae" "Bifidobacterium"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.4_PT "Bifidobacteriaceae" "Bifidobacterium"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.5_PT "Bifidobacteriaceae" "Bifidobacterium"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.6_PT "Bifidobacteriaceae" "Bifidobacterium"</span></span>
+<span><span class="co">#&gt;                      Species               </span></span>
+<span><span class="co">#&gt; Rhodococcus.1_PT     "Rhodococcus.1_PT"    </span></span>
+<span><span class="co">#&gt; Micrococcus.2_PT     "Micrococcus.2_PT"    </span></span>
+<span><span class="co">#&gt; Bifidobacterium.3_PT "Bifidobacterium.3_PT"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.4_PT "Bifidobacterium.4_PT"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.5_PT "Bifidobacterium.5_PT"</span></span>
+<span><span class="co">#&gt; Bifidobacterium.6_PT "Bifidobacterium.6_PT"</span></span></code></pre></div>
 <p>This is will be our <code>tax_table</code></p>
 <p>Build a phyloseq object of theoretical composition</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ps.th</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/phyloseq.html">phyloseq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/otu_table-methods.html">otu_table</a></span><span class="op">(</span><span class="va">mck.otu</span>, taxa_are_rows <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>, 
-                  <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html">sample_data</a></span><span class="op">(</span><span class="va">mck.sam</span><span class="op">)</span>,
-                  <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/tax_table-methods.html">tax_table</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span><span class="op">)</span>
-
-<span class="va">ps.th</span>
-<span class="co">#&gt; phyloseq-class experiment-level object</span>
-<span class="co">#&gt; otu_table()   OTU Table:         [ 55 taxa and 2 samples ]</span>
-<span class="co">#&gt; sample_data() Sample Data:       [ 2 samples by 1 sample variables ]</span>
-<span class="co">#&gt; tax_table()   Taxonomy Table:    [ 55 taxa by 6 taxonomic ranks ]</span></code></pre></div>
-<p>The MIB mock contain 55 phylotypes. There are two types of mocks viz., MC3 and MC4</p>
+<code class="sourceCode R"><span><span class="va">ps.th</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/phyloseq.html" class="external-link">phyloseq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/otu_table-methods.html" class="external-link">otu_table</a></span><span class="op">(</span><span class="va">mck.otu</span>, taxa_are_rows <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>, </span>
+<span>                  <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html" class="external-link">sample_data</a></span><span class="op">(</span><span class="va">mck.sam</span><span class="op">)</span>,</span>
+<span>                  <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/tax_table-methods.html" class="external-link">tax_table</a></span><span class="op">(</span><span class="va">mck.tax</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ps.th</span></span>
+<span><span class="co">#&gt; phyloseq-class experiment-level object</span></span>
+<span><span class="co">#&gt; otu_table()   OTU Table:         [ 55 taxa and 2 samples ]</span></span>
+<span><span class="co">#&gt; sample_data() Sample Data:       [ 2 samples by 1 sample variables ]</span></span>
+<span><span class="co">#&gt; tax_table()   Taxonomy Table:    [ 55 taxa by 6 taxonomic ranks ]</span></span></code></pre></div>
+<p>The MIB mock contain 55 phylotypes. There are two types of mocks
+viz., MC3 and MC4</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_names-methods.html">sample_names</a></span><span class="op">(</span><span class="va">ps.th</span><span class="op">)</span>
-<span class="co">#&gt; [1] "MC3" "MC4"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_names-methods.html" class="external-link">sample_names</a></span><span class="op">(</span><span class="va">ps.th</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "MC3" "MC4"</span></span></code></pre></div>
 </div>
 </div>
-<div id="check-composition-of-theoretical" class="section level2">
-<h2 class="hasAnchor">
-<a href="#check-composition-of-theoretical" class="anchor"></a>Check composition of theoretical</h2>
+<div class="section level3">
+<h3 id="check-composition-of-theoretical">Check composition of theoretical<a class="anchor" aria-label="anchor" href="#check-composition-of-theoretical"></a>
+</h3>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ps.th.genus</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/aggregate_taxa.html">aggregate_taxa</a></span><span class="op">(</span><span class="va">ps.th</span>, <span class="st">"Genus"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/plot_composition.html">plot_composition</a></span><span class="op">(</span><span class="va">ps.th.genus</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position<span class="op">=</span><span class="st">"right"</span>,
-        legend.key.size<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html">unit</a></span><span class="op">(</span><span class="fl">0.2</span>,<span class="st">'cm'</span><span class="op">)</span>,
-        legend.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html">guides</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html">guide_legend</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ps.th.genus</span> <span class="op">&lt;-</span> <span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/aggregate_taxa.html" class="external-link">aggregate_taxa</a></span><span class="op">(</span><span class="va">ps.th</span>, <span class="st">"Genus"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/plot_composition.html" class="external-link">plot_composition</a></span><span class="op">(</span><span class="va">ps.th.genus</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position<span class="op">=</span><span class="st">"right"</span>,</span>
+<span>        legend.key.size<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.2</span>,<span class="st">'cm'</span><span class="op">)</span>,</span>
+<span>        legend.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>col <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="cExampleCustomMocks_files/figure-html/th-gen-1.png" width="3000"></p>
-<p>These are not very useful to visualize with barplots. Too many genera!</p>
+<p>These are not very useful to visualize with barplots. Too many
+genera!</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/plot_composition.html">plot_composition</a></span><span class="op">(</span><span class="va">ps.th.genus</span>, plot.type <span class="op">=</span> <span class="st">"heatmap"</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">scale_fill_viridis_c</a></span><span class="op">(</span><span class="st">"Abudance (%)"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,
-        axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html">coord_flip</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Scale for 'fill' is already present. Adding another scale for 'fill', which</span>
-<span class="co">#&gt; will replace the existing scale.</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/plot_composition.html" class="external-link">plot_composition</a></span><span class="op">(</span><span class="va">ps.th.genus</span>, plot.type <span class="op">=</span> <span class="st">"heatmap"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span><span class="st">"Abudance (%)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>        axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"italic"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Scale for 'fill' is already present. Adding another scale for 'fill', which</span></span>
+<span><span class="co">#&gt; will replace the existing scale.</span></span></code></pre></div>
 <p><img src="cExampleCustomMocks_files/figure-html/th-heatmap-1.png" width="3000"></p>
 </div>
-<div id="new-experiment" class="section level2">
-<h2 class="hasAnchor">
-<a href="#new-experiment" class="anchor"></a>New experiment</h2>
+<div class="section level3">
+<h3 id="new-experiment">New experiment<a class="anchor" aria-label="anchor" href="#new-experiment"></a>
+</h3>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Here example is store in the package.</span>
-<span class="va">ps.mib.w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ps.mib.rds"</span>,
-                        package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#path for file</span>
-<span class="va">ps.mib.w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html">readRDS</a></span><span class="op">(</span><span class="va">ps.mib.w</span><span class="op">)</span>
-
-<span class="co"># taxa names are ASV seqs. Check first 2 names/ASV seqs</span>
-<span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/taxa_names-methods.html">taxa_names</a></span><span class="op">(</span><span class="va">ps.mib.w</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>
-<span class="co">#&gt; [1] "GTGTAACGCCTCCGAAGAGTCGCATGCTTTCACATGTTGTTCATTACATGTCAAGCCCAGGTAAGGTTCTTCGCGTTGCATCGAATTAAGCCACATACTCCACCGCTTGTGCGGGTCCCCNNNNNNNNNNCTTTGAGTTTTAATCTTGCGACCGTACTCCCCAGGCGGCACGCTTAACGCGTTAGCTCCGGCACGCAGGGGGTCGATTCCCCGCACACCAAGCGTGCACCGTTTACTGCCAGGACTACAG"</span>
-<span class="co">#&gt; [2] "CTGTAGTCCTGGCAGTAAACGGTGCACGCTTGGTGTGCGGGGAATCGACCCCCTGCGTGCCGGAGCTAACGCGTTAAGCGTGCCGCCTGGGGAGTACGGTCGCAAGATTAAAACTCAAAGNNNNNNNNNNGGGGACCCGCACAAGCGGTGGAGTATGTGGCTTAATTCGATGCAACGCGAAGAACCTTACCTGGGCTTGACATGTAATGAACAACATGTGAAAGCATGCGACTCTTCGGAGGCGTTACAC"</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Here example is store in the package.</span></span>
+<span><span class="va">ps.mib.w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ps.mib.rds"</span>,</span>
+<span>                        package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#path for file</span></span>
+<span><span class="va">ps.mib.w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="va">ps.mib.w</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># taxa names are ASV seqs. Check first 2 names/ASV seqs</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/taxa_names-methods.html" class="external-link">taxa_names</a></span><span class="op">(</span><span class="va">ps.mib.w</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] "GTGTAACGCCTCCGAAGAGTCGCATGCTTTCACATGTTGTTCATTACATGTCAAGCCCAGGTAAGGTTCTTCGCGTTGCATCGAATTAAGCCACATACTCCACCGCTTGTGCGGGTCCCCNNNNNNNNNNCTTTGAGTTTTAATCTTGCGACCGTACTCCCCAGGCGGCACGCTTAACGCGTTAGCTCCGGCACGCAGGGGGTCGATTCCCCGCACACCAAGCGTGCACCGTTTACTGCCAGGACTACAG"</span></span>
+<span><span class="co">#&gt; [2] "CTGTAGTCCTGGCAGTAAACGGTGCACGCTTGGTGTGCGGGGAATCGACCCCCTGCGTGCCGGAGCTAACGCGTTAAGCGTGCCGCCTGGGGAGTACGGTCGCAAGATTAAAACTCAAAGNNNNNNNNNNGGGGACCCGCACAAGCGGTGGAGTATGTGGCTTAATTCGATGCAACGCGAAGAACCTTACCTGGGCTTGACATGTAATGAACAACATGTGAAAGCATGCGACTCTTCGGAGGCGTTACAC"</span></span></code></pre></div>
 </div>
-<div id="assign-custom-taxonomy" class="section level2">
-<h2 class="hasAnchor">
-<a href="#assign-custom-taxonomy" class="anchor"></a>Assign custom taxonomy</h2>
+<div class="section level3">
+<h3 id="assign-custom-taxonomy">Assign custom taxonomy<a class="anchor" aria-label="anchor" href="#assign-custom-taxonomy"></a>
+</h3>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ps.mib</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assignTaxonomyCustomMock.html">assignTaxonomyCustomMock</a></span><span class="op">(</span><span class="va">ps.mib.w</span>, <span class="co"># experimental mock community phyloseq</span>
-                                   mock_db <span class="op">=</span> <span class="va">MIBTrainingSet</span>, <span class="co"># custome training set  </span>
-                                   processors <span class="op">=</span> <span class="cn">NULL</span>,
-                                   threshold <span class="op">=</span> <span class="fl">60</span>,
-                                   strand <span class="op">=</span> <span class="st">"top"</span>,
-                                   verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="co">#&gt; Warning: Expected 8 pieces. Missing pieces filled with `NA` in 1373 rows [1, 3,</span>
-<span class="co">#&gt; 5, 7, 8, 12, 14, 15, 16, 18, 19, 20, 21, 22, 24, 26, 27, 28, 29, 30, ...].</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ps.mib</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assignTaxonomyCustomMock.html">assignTaxonomyCustomMock</a></span><span class="op">(</span><span class="va">ps.mib.w</span>, <span class="co"># experimental mock community phyloseq</span></span>
+<span>                                   mock_db <span class="op">=</span> <span class="va">MIBTrainingSet</span>, <span class="co"># custome training set  </span></span>
+<span>                                   processors <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                                   threshold <span class="op">=</span> <span class="fl">60</span>,</span>
+<span>                                   strand <span class="op">=</span> <span class="st">"top"</span>,</span>
+<span>                                   verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: Expected 8 pieces. Missing pieces filled with `NA` in 1360 rows [1, 3,</span></span>
+<span><span class="co">#&gt; 5, 7, 8, 12, 14, 15, 16, 18, 19, 20, 21, 22, 24, 26, 28, 29, 30, 31, ...].</span></span></code></pre></div>
 </div>
-<div id="aggregate-to-species" class="section level2">
-<h2 class="hasAnchor">
-<a href="#aggregate-to-species" class="anchor"></a>Aggregate to species</h2>
+<div class="section level3">
+<h3 id="aggregate-to-species">Aggregate to species<a class="anchor" aria-label="anchor" href="#aggregate-to-species"></a>
+</h3>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ps.mib</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/aggregate_taxa.html">aggregate_taxa</a></span><span class="op">(</span><span class="va">ps.mib</span>, <span class="st">"species"</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/taxa_names-methods.html">taxa_names</a></span><span class="op">(</span><span class="va">ps.mib</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "Micrococcus.2_PT"                          </span>
-<span class="co">#&gt;  [2] "Rhodococcus.1_PT"                          </span>
-<span class="co">#&gt;  [3] "Bifidobacterium.10_PT"                     </span>
-<span class="co">#&gt;  [4] "Bifidobacterium.4_PT"                      </span>
-<span class="co">#&gt;  [5] "Bifidobacterium.5_PT"                      </span>
-<span class="co">#&gt;  [6] "Bifidobacterium.6_PT"                      </span>
-<span class="co">#&gt;  [7] "Bifidobacterium.8_PT"                      </span>
-<span class="co">#&gt;  [8] "unclassified_Bifidobacterium"              </span>
-<span class="co">#&gt;  [9] "Bacteroides.12_PT"                         </span>
-<span class="co">#&gt; [10] "Bacteroides.13_PT"                         </span>
-<span class="co">#&gt; [11] "Bacteroides.14_PT"                         </span>
-<span class="co">#&gt; [12] "Bacteroides.15_PT"                         </span>
-<span class="co">#&gt; [13] "unclassified_Bacteroides"                  </span>
-<span class="co">#&gt; [14] "Parabacteroides.17_PT"                     </span>
-<span class="co">#&gt; [15] "Prevotella.18_PT"                          </span>
-<span class="co">#&gt; [16] "Alistipes.19_PT"                           </span>
-<span class="co">#&gt; [17] "Bacillus.20_PT"                            </span>
-<span class="co">#&gt; [18] "Bacillus.21_PT"                            </span>
-<span class="co">#&gt; [19] "unclassified_Bacillus"                     </span>
-<span class="co">#&gt; [20] "Granulicatella.22_PT"                      </span>
-<span class="co">#&gt; [21] "Enterococcus.23_PT"                        </span>
-<span class="co">#&gt; [22] "Lactobacillus.24_PT"                       </span>
-<span class="co">#&gt; [23] "Lactobacillus.25_PT"                       </span>
-<span class="co">#&gt; [24] "Lactobacillus.26_PT"                       </span>
-<span class="co">#&gt; [25] "unclassified_Lactobacillus"                </span>
-<span class="co">#&gt; [26] "Lactococcus.27_PT"                         </span>
-<span class="co">#&gt; [27] "Streptococcus.28_PT"                       </span>
-<span class="co">#&gt; [28] "Streptococcus.29_PT"                       </span>
-<span class="co">#&gt; [29] "unclassified_Streptococcus"                </span>
-<span class="co">#&gt; [30] "Clostridium sensu stricto.30_PT"           </span>
-<span class="co">#&gt; [31] "Anaerostipes.31_PT"                        </span>
-<span class="co">#&gt; [32] "Blautia.32_PT"                             </span>
-<span class="co">#&gt; [33] "Dorea.33_PT"                               </span>
-<span class="co">#&gt; [34] "Lachnospiracea_incertae_sedis.34_PT"       </span>
-<span class="co">#&gt; [35] "Lachnospiracea_incertae_sedis.35_PT"       </span>
-<span class="co">#&gt; [36] "Lachnospiracea_incertae_sedis.36_PT"       </span>
-<span class="co">#&gt; [37] "unclassified_Lachnospiracea_incertae_sedis"</span>
-<span class="co">#&gt; [38] "Roseburia.37_PT"                           </span>
-<span class="co">#&gt; [39] "Ruminococcus2.38_PT"                       </span>
-<span class="co">#&gt; [40] "Clostridium XI.39_PT"                      </span>
-<span class="co">#&gt; [41] "Clostridium IV.40_PT"                      </span>
-<span class="co">#&gt; [42] "Faecalibacterium.41_PT"                    </span>
-<span class="co">#&gt; [43] "Veillonella.42_PT"                         </span>
-<span class="co">#&gt; [44] "Fusobacterium.43_PT"                       </span>
-<span class="co">#&gt; [45] "Victivallis.44_PT"                         </span>
-<span class="co">#&gt; [46] "Enterobacter.46_PT"                        </span>
-<span class="co">#&gt; [47] "Enterobacter.48_PT"                        </span>
-<span class="co">#&gt; [48] "unclassified_Enterobacter"                 </span>
-<span class="co">#&gt; [49] "Escherichia/Shigella.49_PT"                </span>
-<span class="co">#&gt; [50] "Klebsiella.50_PT"                          </span>
-<span class="co">#&gt; [51] "Salmonella.51_PT"                          </span>
-<span class="co">#&gt; [52] "Serratia.52_PT"                            </span>
-<span class="co">#&gt; [53] "Pseudomonas.53_PT"                         </span>
-<span class="co">#&gt; [54] "Pseudomonas.54_PT"                         </span>
-<span class="co">#&gt; [55] "Akkermansia.55_PT"                         </span>
-<span class="co">#&gt; [56] "Unknown"</span>
-<span class="co"># convert to relative abundance  </span>
-<span class="va">ps.mib</span> <span class="op">&lt;-</span> <span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/transform.html">transform</a></span><span class="op">(</span><span class="va">ps.mib</span>, <span class="st">"compositional"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ps.mib</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/aggregate_taxa.html" class="external-link">aggregate_taxa</a></span><span class="op">(</span><span class="va">ps.mib</span>, <span class="st">"species"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/taxa_names-methods.html" class="external-link">taxa_names</a></span><span class="op">(</span><span class="va">ps.mib</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "Micrococcus.2_PT"                          </span></span>
+<span><span class="co">#&gt;  [2] "Rhodococcus.1_PT"                          </span></span>
+<span><span class="co">#&gt;  [3] "Bifidobacterium.10_PT"                     </span></span>
+<span><span class="co">#&gt;  [4] "Bifidobacterium.4_PT"                      </span></span>
+<span><span class="co">#&gt;  [5] "Bifidobacterium.5_PT"                      </span></span>
+<span><span class="co">#&gt;  [6] "Bifidobacterium.6_PT"                      </span></span>
+<span><span class="co">#&gt;  [7] "Bifidobacterium.8_PT"                      </span></span>
+<span><span class="co">#&gt;  [8] "unclassified_Bifidobacterium"              </span></span>
+<span><span class="co">#&gt;  [9] "Bacteroides.12_PT"                         </span></span>
+<span><span class="co">#&gt; [10] "Bacteroides.13_PT"                         </span></span>
+<span><span class="co">#&gt; [11] "Bacteroides.14_PT"                         </span></span>
+<span><span class="co">#&gt; [12] "Bacteroides.15_PT"                         </span></span>
+<span><span class="co">#&gt; [13] "unclassified_Bacteroides"                  </span></span>
+<span><span class="co">#&gt; [14] "Parabacteroides.17_PT"                     </span></span>
+<span><span class="co">#&gt; [15] "Prevotella.18_PT"                          </span></span>
+<span><span class="co">#&gt; [16] "Alistipes.19_PT"                           </span></span>
+<span><span class="co">#&gt; [17] "Bacillus.20_PT"                            </span></span>
+<span><span class="co">#&gt; [18] "Bacillus.21_PT"                            </span></span>
+<span><span class="co">#&gt; [19] "unclassified_Bacillus"                     </span></span>
+<span><span class="co">#&gt; [20] "Granulicatella.22_PT"                      </span></span>
+<span><span class="co">#&gt; [21] "Enterococcus.23_PT"                        </span></span>
+<span><span class="co">#&gt; [22] "Lactobacillus.24_PT"                       </span></span>
+<span><span class="co">#&gt; [23] "Lactobacillus.25_PT"                       </span></span>
+<span><span class="co">#&gt; [24] "Lactobacillus.26_PT"                       </span></span>
+<span><span class="co">#&gt; [25] "unclassified_Lactobacillus"                </span></span>
+<span><span class="co">#&gt; [26] "Lactococcus.27_PT"                         </span></span>
+<span><span class="co">#&gt; [27] "Streptococcus.28_PT"                       </span></span>
+<span><span class="co">#&gt; [28] "Streptococcus.29_PT"                       </span></span>
+<span><span class="co">#&gt; [29] "unclassified_Streptococcus"                </span></span>
+<span><span class="co">#&gt; [30] "Clostridium sensu stricto.30_PT"           </span></span>
+<span><span class="co">#&gt; [31] "Anaerostipes.31_PT"                        </span></span>
+<span><span class="co">#&gt; [32] "Blautia.32_PT"                             </span></span>
+<span><span class="co">#&gt; [33] "Dorea.33_PT"                               </span></span>
+<span><span class="co">#&gt; [34] "Lachnospiracea_incertae_sedis.34_PT"       </span></span>
+<span><span class="co">#&gt; [35] "Lachnospiracea_incertae_sedis.35_PT"       </span></span>
+<span><span class="co">#&gt; [36] "Lachnospiracea_incertae_sedis.36_PT"       </span></span>
+<span><span class="co">#&gt; [37] "unclassified_Lachnospiracea_incertae_sedis"</span></span>
+<span><span class="co">#&gt; [38] "Roseburia.37_PT"                           </span></span>
+<span><span class="co">#&gt; [39] "Ruminococcus2.38_PT"                       </span></span>
+<span><span class="co">#&gt; [40] "Clostridium XI.39_PT"                      </span></span>
+<span><span class="co">#&gt; [41] "Clostridium IV.40_PT"                      </span></span>
+<span><span class="co">#&gt; [42] "Faecalibacterium.41_PT"                    </span></span>
+<span><span class="co">#&gt; [43] "Veillonella.42_PT"                         </span></span>
+<span><span class="co">#&gt; [44] "Fusobacterium.43_PT"                       </span></span>
+<span><span class="co">#&gt; [45] "Victivallis.44_PT"                         </span></span>
+<span><span class="co">#&gt; [46] "Enterobacter.46_PT"                        </span></span>
+<span><span class="co">#&gt; [47] "Enterobacter.48_PT"                        </span></span>
+<span><span class="co">#&gt; [48] "Escherichia/Shigella.49_PT"                </span></span>
+<span><span class="co">#&gt; [49] "Klebsiella.50_PT"                          </span></span>
+<span><span class="co">#&gt; [50] "Salmonella.51_PT"                          </span></span>
+<span><span class="co">#&gt; [51] "Serratia.52_PT"                            </span></span>
+<span><span class="co">#&gt; [52] "Pseudomonas.53_PT"                         </span></span>
+<span><span class="co">#&gt; [53] "Pseudomonas.54_PT"                         </span></span>
+<span><span class="co">#&gt; [54] "Akkermansia.55_PT"                         </span></span>
+<span><span class="co">#&gt; [55] "Unknown"</span></span>
+<span></span>
+<span><span class="co"># convert to relative abundance  </span></span>
+<span><span class="va">ps.mib</span> <span class="op">&lt;-</span> <span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">ps.mib</span>, <span class="st">"compositional"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="merge-with-theoretical" class="section level2">
-<h2 class="hasAnchor">
-<a href="#merge-with-theoretical" class="anchor"></a>Merge with theoretical</h2>
+<div class="section level3">
+<h3 id="merge-with-theoretical">Merge with theoretical<a class="anchor" aria-label="anchor" href="#merge-with-theoretical"></a>
+</h3>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># There is one sampe here</span>
-<span class="fu">phyloseq</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html">sample_data</a></span><span class="op">(</span><span class="va">ps.th</span><span class="op">)</span><span class="op">$</span><span class="va">MockType</span> <span class="op">&lt;-</span> <span class="st">"Theoretical"</span>
-
-<span class="co"># adding new column to ps.mck.nw.tax may be for other comparisons user might be interested in doing.</span>
-<span class="fu">phyloseq</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html">sample_data</a></span><span class="op">(</span><span class="va">ps.mib</span><span class="op">)</span><span class="op">$</span><span class="va">MockType</span> <span class="op">&lt;-</span> <span class="st">"Experimental"</span>
-
-
-<span class="va">ps.custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/merge_phyloseq.html">merge_phyloseq</a></span><span class="op">(</span><span class="va">ps.mib</span>, <span class="va">ps.th</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="co"># There is one sampe here</span></span>
+<span><span class="fu">phyloseq</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html" class="external-link">sample_data</a></span><span class="op">(</span><span class="va">ps.th</span><span class="op">)</span><span class="op">$</span><span class="va">MockType</span> <span class="op">&lt;-</span> <span class="st">"Theoretical"</span></span>
+<span></span>
+<span><span class="co"># adding new column to ps.mck.nw.tax may be for other comparisons user might be interested in doing.</span></span>
+<span><span class="fu">phyloseq</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/sample_data-methods.html" class="external-link">sample_data</a></span><span class="op">(</span><span class="va">ps.mib</span><span class="op">)</span><span class="op">$</span><span class="va">MockType</span> <span class="op">&lt;-</span> <span class="st">"Experimental"</span></span>
+<span></span>
+<span></span>
+<span><span class="va">ps.custom</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/phyloseq/man/merge_phyloseq.html" class="external-link">merge_phyloseq</a></span><span class="op">(</span><span class="va">ps.mib</span>, <span class="va">ps.th</span><span class="op">)</span></span></code></pre></div>
 <p>Compare the experimental mocks with theoretical mocks 3</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom</span>,  theoretical_id <span class="op">=</span> <span class="st">"MC3"</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 7 x 2</span>
-<span class="co">#&gt;   term            MC3</span>
-<span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 Lib1_Mock_3  0.347 </span>
-<span class="co">#&gt; 2 Lib1_Mock_4 -0.108 </span>
-<span class="co">#&gt; 3 Lib2_Mock_3  0.374 </span>
-<span class="co">#&gt; 4 Lib2_Mock_4 -0.0882</span>
-<span class="co">#&gt; 5 Lib3_Mock_3  0.381 </span>
-<span class="co">#&gt; 6 Lib3_Mock_4 -0.111 </span>
-<span class="co">#&gt; 7 MC4          0.302</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom</span>,  theoretical_id <span class="op">=</span> <span class="st">"MC3"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 2</span></span></span>
+<span><span class="co">#&gt;   term            MC3</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Lib1_Mock_3  0.398 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Lib1_Mock_4 -<span style="color: #BB0000;">0.082</span><span style="color: #BB0000; text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Lib2_Mock_3  0.408 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Lib2_Mock_4 -<span style="color: #BB0000;">0.049</span><span style="color: #BB0000; text-decoration: underline;">5</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Lib3_Mock_3  0.404 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Lib3_Mock_4 -<span style="color: #BB0000;">0.071</span><span style="color: #BB0000; text-decoration: underline;">1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> MC4          0.258</span></span></code></pre></div>
 <p>Visualize</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cor.table.ref</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom</span>, theoretical <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">corrr</span><span class="fu">::</span><span class="fu"><a href="https://corrr.tidymodels.org/reference/focus.html">focus</a></span><span class="op">(</span><span class="va">MC3</span><span class="op">)</span>
-<span class="co">#&gt; Check that theoretical =  exists in sample_names(x)</span>
-<span class="co">#&gt; returning all pairwise comparisons</span>
-<span class="va">cor.table.ref</span> <span class="op">%&gt;%</span> 
-  <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="co"># Remove MC4 theoretical and experimental and keep only those with MC3</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">term</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Lib1_Mock_4"</span>, <span class="st">"Lib2_Mock_4"</span>, <span class="st">"Lib3_Mock_4"</span>, <span class="st">"MC4"</span><span class="op">)</span> <span class="op">&amp;</span>
-                  <span class="va">variable</span> <span class="op">==</span> <span class="st">"MC3"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">value</span>,<span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="co">#facet_grid(~variable) +</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Experimental Mocks"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Spearman correlation"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="co">#scale_fill_viridis_c() +</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Species level correlation"</span><span class="op">)</span> <span class="op">+</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Using term as id variables</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cor.table.ref</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom</span>, theoretical <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">corrr</span><span class="fu">::</span><span class="fu"><a href="https://corrr.tidymodels.org/reference/focus.html" class="external-link">focus</a></span><span class="op">(</span><span class="va">MC3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Check that theoretical =  exists in sample_names(x)</span></span>
+<span><span class="co">#&gt; returning all pairwise comparisons</span></span>
+<span></span>
+<span><span class="va">cor.table.ref</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="co"># Remove MC4 theoretical and experimental and keep only those with MC3</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">term</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Lib1_Mock_4"</span>, <span class="st">"Lib2_Mock_4"</span>, <span class="st">"Lib3_Mock_4"</span>, <span class="st">"MC4"</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>                  <span class="va">variable</span> <span class="op">==</span> <span class="st">"MC3"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">value</span>,<span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co">#facet_grid(~variable) +</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Experimental Mocks"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Spearman's correlation"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Species level correlation"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using term as id variables</span></span></code></pre></div>
 <p><img src="cExampleCustomMocks_files/figure-html/viz-cor-1-1.png" width="3000"></p>
-<p>This is an example where one can observe that in high diversity mocks with some closely related “species”, the assignments based on short reads is difficult. The correlation values are less than 0.5.</p>
+<p>This is an example where one can observe that in high diversity mocks
+with some closely related “species”, the assignments based on short
+reads is difficult. The correlation values are less than 0.5.</p>
 </div>
-<div id="aggregate-to-genus" class="section level2">
-<h2 class="hasAnchor">
-<a href="#aggregate-to-genus" class="anchor"></a>Aggregate to Genus</h2>
-<p>It is well known that the Genus level assignments with short reads is better than “species” level assignments. Therefore, we can check the correlation at genus level.</p>
+<div class="section level3">
+<h3 id="aggregate-to-genus">Aggregate to Genus<a class="anchor" aria-label="anchor" href="#aggregate-to-genus"></a>
+</h3>
+<p>It is well known that the Genus level assignments with short reads is
+better than “species” level assignments. Therefore, we can check the
+correlation at genus level.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ps.custom.gen</span> <span class="op">&lt;-</span> <span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/aggregate_taxa.html">aggregate_taxa</a></span><span class="op">(</span><span class="va">ps.custom</span>, <span class="st">"genus"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ps.custom.gen</span> <span class="op">&lt;-</span> <span class="fu">microbiome</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/microbiome/man/aggregate_taxa.html" class="external-link">aggregate_taxa</a></span><span class="op">(</span><span class="va">ps.custom</span>, <span class="st">"genus"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom.gen</span>,  theoretical_id <span class="op">=</span> <span class="st">"MC3"</span><span class="op">)</span>
-<span class="co">#&gt; # A tibble: 7 x 2</span>
-<span class="co">#&gt;   term             MC3</span>
-<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 Lib1_Mock_3  0.775  </span>
-<span class="co">#&gt; 2 Lib1_Mock_4 -0.00760</span>
-<span class="co">#&gt; 3 Lib2_Mock_3  0.771  </span>
-<span class="co">#&gt; 4 Lib2_Mock_4 -0.0433 </span>
-<span class="co">#&gt; 5 Lib3_Mock_3  0.775  </span>
-<span class="co">#&gt; 6 Lib3_Mock_4 -0.0409 </span>
-<span class="co">#&gt; 7 MC4          0.0807</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom.gen</span>,  theoretical_id <span class="op">=</span> <span class="st">"MC3"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 2</span></span></span>
+<span><span class="co">#&gt;   term              MC3</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Lib1_Mock_3  0.771   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Lib1_Mock_4 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">485</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Lib2_Mock_3  0.762   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Lib2_Mock_4 -<span style="color: #BB0000;">0.052</span><span style="color: #BB0000; text-decoration: underline;">1</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Lib3_Mock_3  0.766   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Lib3_Mock_4 -<span style="color: #BB0000;">0.038</span><span style="color: #BB0000; text-decoration: underline;">7</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> MC4          0.080<span style="text-decoration: underline;">7</span></span></span></code></pre></div>
 <p>Compare the values for MC3</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cor.table.ref</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom.gen</span>, theoretical <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">corrr</span><span class="fu">::</span><span class="fu"><a href="https://corrr.tidymodels.org/reference/focus.html">focus</a></span><span class="op">(</span><span class="va">MC3</span><span class="op">)</span>
-<span class="co">#&gt; Check that theoretical =  exists in sample_names(x)</span>
-<span class="co">#&gt; returning all pairwise comparisons</span>
-<span class="va">cor.table.ref</span> <span class="op">%&gt;%</span> 
-  <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="co"># Remove MC4 theoretical and experimental and keep only those with MC3</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">term</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Lib1_Mock_4"</span>, <span class="st">"Lib2_Mock_4"</span>, <span class="st">"Lib3_Mock_4"</span>, <span class="st">"MC4"</span><span class="op">)</span> <span class="op">&amp;</span>
-                  <span class="va">variable</span> <span class="op">==</span> <span class="st">"MC3"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">value</span>,<span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="co">#facet_grid(~variable) +</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Experimental Mocks"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Spearman correlation"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="co">#scale_fill_viridis_c() +</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Genus level correlation"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Using term as id variables</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cor.table.ref</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom.gen</span>, theoretical <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">corrr</span><span class="fu">::</span><span class="fu"><a href="https://corrr.tidymodels.org/reference/focus.html" class="external-link">focus</a></span><span class="op">(</span><span class="va">MC3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Check that theoretical =  exists in sample_names(x)</span></span>
+<span><span class="co">#&gt; returning all pairwise comparisons</span></span>
+<span></span>
+<span><span class="va">cor.table.ref</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="co"># Remove MC4 theoretical and experimental and keep only those with MC3</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">term</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Lib1_Mock_4"</span>, <span class="st">"Lib2_Mock_4"</span>, <span class="st">"Lib3_Mock_4"</span>, <span class="st">"MC4"</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>                  <span class="va">variable</span> <span class="op">==</span> <span class="st">"MC3"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">value</span>,<span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co">#facet_grid(~variable) +</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Experimental Mocks"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Spearman correlation"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co">#scale_fill_viridis_c() +</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Genus level correlation"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using term as id variables</span></span></code></pre></div>
 <p><img src="cExampleCustomMocks_files/figure-html/viz-cor-2-1.png" width="3000"></p>
 <p>Compare the values for MC4</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cor.table.ref</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom.gen</span>, theoretical <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu">corrr</span><span class="fu">::</span><span class="fu"><a href="https://corrr.tidymodels.org/reference/focus.html">focus</a></span><span class="op">(</span><span class="va">MC4</span><span class="op">)</span>
-<span class="co">#&gt; Check that theoretical =  exists in sample_names(x)</span>
-<span class="co">#&gt; returning all pairwise comparisons</span>
-<span class="va">cor.table.ref</span> <span class="op">%&gt;%</span> 
-  <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html">melt</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="co"># Remove MC4 theoretical and experimental and keep only those with MC3</span>
-  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">term</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Lib1_Mock_3"</span>, <span class="st">"Lib2_Mock_3"</span>, <span class="st">"Lib3_Mock_3"</span>, <span class="st">"MC3"</span><span class="op">)</span> <span class="op">&amp;</span>
-                  <span class="va">variable</span> <span class="op">==</span> <span class="st">"MC4"</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">value</span>,<span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html">geom_col</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="co">#facet_grid(~variable) +</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ylab</a></span><span class="op">(</span><span class="st">"Experimental Mocks"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">xlab</a></span><span class="op">(</span><span class="st">"Spearman correlation"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="co">#scale_fill_viridis_c() +</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">"Genus level correlation"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html">scale_x_continuous</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt; Using term as id variables</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cor.table.ref</span> <span class="op">&lt;-</span><span class="fu"><a href="../reference/compare2theorectical.html">compare2theorectical</a></span><span class="op">(</span><span class="va">ps.custom.gen</span>, theoretical <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">corrr</span><span class="fu">::</span><span class="fu"><a href="https://corrr.tidymodels.org/reference/focus.html" class="external-link">focus</a></span><span class="op">(</span><span class="va">MC4</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Check that theoretical =  exists in sample_names(x)</span></span>
+<span><span class="co">#&gt; returning all pairwise comparisons</span></span>
+<span></span>
+<span><span class="va">cor.table.ref</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="co"># Remove MC4 theoretical and experimental and keep only those with MC3</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">term</span> <span class="op"><a href="https://rdrr.io/pkg/BiocGenerics/man/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Lib1_Mock_3"</span>, <span class="st">"Lib2_Mock_3"</span>, <span class="st">"Lib3_Mock_3"</span>, <span class="st">"MC3"</span><span class="op">)</span> <span class="op">&amp;</span></span>
+<span>                  <span class="va">variable</span> <span class="op">==</span> <span class="st">"MC4"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">value</span>,<span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"steelblue"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co">#facet_grid(~variable) +</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ylab</a></span><span class="op">(</span><span class="st">"Experimental Mocks"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">xlab</a></span><span class="op">(</span><span class="st">"Spearman correlation"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co">#scale_fill_viridis_c() +</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Genus level correlation"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Using term as id variables</span></span></code></pre></div>
 <p><img src="cExampleCustomMocks_files/figure-html/viz-cor-3-1.png" width="3000"></p>
-<p>There is a major improvement in correlation between theoretical and expected mock communities.</p>
+<p>There is a major improvement in correlation between theoretical and
+expected mock communities.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sessioninfo/man/session_info.html">session_info</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://r-lib.github.io/sessioninfo/reference/session_info.html" class="external-link">session_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </div>
@@ -592,11 +623,13 @@ These are from the <a href="https://www.bioconductor.org/packages/release/bioc/v
 
 
       <footer><div class="copyright">
-  <p>Developed by Sudarshan Shetty.</p>
+  <p></p>
+<p>Developed by Sudarshan Shetty.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
@@ -604,6 +637,8 @@ These are from the <a href="https://www.bioconductor.org/packages/release/bioc/v
 
   
 
+
+  
 
   </body>
 </html>

@@ -9,7 +9,7 @@ Authors@R:
     email = "sudarshanshetty9@gmail.com",
     comment = c(ORCID = "0000-0001-7280-9915"))
 Maintainer: Sudarshan Shetty <sudarshanshetty9@gmail.com>
-Description: chkMocks is a basic R package for comparing experimental ZymoBiomics samples with theoretical composition. Default composition is for Product name D6300.Not tested with custom mocks.
+Description: chkMocks is a basic R package for comparing experimental mock samples with their expected composition.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -34,6 +34,6 @@ Suggests:
     knitr,
     rmarkdown,
     reshape2
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0
 VignetteBuilder: knitr
 URL: https://github.com/microsud/chkMocks

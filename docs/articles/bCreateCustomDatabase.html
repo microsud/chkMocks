@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,23 +33,17 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">chkMocks</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.03</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.03</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
-<li>
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/microsud/chkMocks/">
+  <a href="https://github.com/microsud/chkMocks/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -85,116 +81,120 @@
 
       
 
-      </header><script src="bCreateCustomDatabase_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Create a custome database</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/microsud/chkMocks/blob/master/vignettes/bCreateCustomDatabase.Rmd"><code>vignettes/bCreateCustomDatabase.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/microsud/chkMocks/blob/HEAD/vignettes/bCreateCustomDatabase.Rmd" class="external-link"><code>vignettes/bCreateCustomDatabase.Rmd</code></a></small>
       <div class="hidden name"><code>bCreateCustomDatabase.Rmd</code></div>
 
     </div>
 
     
     
-<p>This is experimental stage!</p>
-<p>How to prepare a custom training set for <code><a href="https://rdrr.io/pkg/DECIPHER/man/IdTaxa.html">DECIPHER::IdTaxa</a></code>?<br>
-These are from the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf">DECIPHER</a> package.</p>
-<div id="library" class="section level1">
-<h1 class="hasAnchor">
-<a href="#library" class="anchor"></a>Library</h1>
+<p>How to prepare a custom training set for
+<code><a href="https://rdrr.io/pkg/DECIPHER/man/IdTaxa.html" class="external-link">DECIPHER::IdTaxa</a></code>?<br>
+These are from the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/DECIPHER/inst/doc/ClassifySequences.pdf" class="external-link">DECIPHER</a>
+package.</p>
+<div class="section level2">
+<h2 id="library">Library<a class="anchor" aria-label="anchor" href="#library"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">DECIPHER</span><span class="op">)</span></code></pre></div>
-<p>Read the fasta file with 16S rRNA gene sequences for taxa in mock community.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">DECIPHER</span><span class="op">)</span></span></code></pre></div>
+<p>Read the fasta file with 16S rRNA gene sequences for taxa in mock
+community.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Here example is store in the package.</span>
-<span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZymoDb.fasta"</span>,
-                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="co">#path for file</span>
-<span class="va">db</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Here example is store in the package.</span></span>
+<span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ZymoDb.fasta"</span>,</span>
+<span>                      package<span class="op">=</span><span class="st">"chkMocks"</span>, mustWork <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#path for file</span></span>
+<span><span class="va">db</span></span></code></pre></div>
 <p>Convert to <code>DNAStringSet</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">Biostrings</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Biostrings/man/XStringSet-io.html">readDNAStringSet</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span>
-<span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/OrientNucleotides.html">OrientNucleotides</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span>
-<span class="co"># check first 2 as example</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></code></pre></div>
-<p>Now, adding the dummy seq name before &gt; and adding a ‘Root’ before Bacteria;Phylum;etc;</p>
+<code class="sourceCode R"><span><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu">Biostrings</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Biostrings/man/XStringSet-io.html" class="external-link">readDNAStringSet</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
+<span><span class="va">seqs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/OrientNucleotides.html" class="external-link">OrientNucleotides</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span></span>
+<span><span class="co"># check first 2 as example</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></code></pre></div>
+<p>Now, adding the dummy seq name before &gt; and adding a ‘Root’ before
+Bacteria;Phylum;etc;</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># here, adding the dummy seq name before &gt; and adding a 'Root' before Bacteria;Phylum;etc;</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"ZymoSeq"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="st">" "</span>, <span class="st">"Root;"</span> ,<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span>
-
-<span class="co"># check first 2 as example</span>
-<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></code></pre></div>
-<p>We show how to check for problematic taxonomies. However, it will most likely be not required if input fasta is formatted correctly.</p>
+<code class="sourceCode R"><span><span class="co"># here, adding the dummy seq name before &gt; and adding a 'Root' before Bacteria;Phylum;etc;</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"ZymoSeq"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="st">" "</span>, <span class="st">"Root;"</span> ,<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># check first 2 as example</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span></span></code></pre></div>
+<p>We show how to check for problematic taxonomies. However, it will
+most likely be not required if input fasta is formatted correctly.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="co"># sequence names</span>
-<span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html">gsub</a></span><span class="op">(</span><span class="st">"(.*)(Root;)"</span>, <span class="st">"\\2"</span>, <span class="va">groups</span><span class="op">)</span>
-<span class="va">groupCounts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span>
-<span class="va">u_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">groupCounts</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">u_groups</span><span class="op">)</span>
-<span class="va">maxGroupSize</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># max sequences per label (&gt;= 1)</span>
-<span class="va">remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html">logical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span> <span class="co"># sequence names</span></span>
+<span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">"(.*)(Root;)"</span>, <span class="st">"\\2"</span>, <span class="va">groups</span><span class="op">)</span></span>
+<span><span class="va">groupCounts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span></span>
+<span><span class="va">u_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groupCounts</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">u_groups</span><span class="op">)</span></span>
+<span><span class="va">maxGroupSize</span> <span class="op">&lt;-</span> <span class="fl">10</span> <span class="co"># max sequences per label (&gt;= 1)</span></span>
+<span><span class="va">remove</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/logical.html" class="external-link">logical</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Create a training set.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">maxIterations</span> <span class="op">&lt;-</span> <span class="fl">3</span>
-<span class="va">allowGroupRemoval</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span>
-<span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">integer</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">groupCounts</span> <span class="op">&gt;</span> <span class="va">maxGroupSize</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">groups</span><span class="op">==</span><span class="va">u_groups</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span>
-  <span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">index</span><span class="op">)</span>,
-                 <span class="va">maxGroupSize</span><span class="op">)</span>
-  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="op">-</span><span class="va">keep</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span>
-<span class="op">}</span>
-<span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span>
-
-<span class="va">taxid</span> <span class="op">&lt;-</span> <span class="cn">NULL</span>
-<span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">maxIterations</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Training iteration: "</span>, <span class="va">i</span>, <span class="st">"\n"</span>, sep<span class="op">=</span><span class="st">""</span><span class="op">)</span>
-  <span class="co"># train the classifier</span>
-  <span class="va">ZymoTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/LearnTaxa.html">LearnTaxa</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,
-                           <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,
-                           <span class="va">taxid</span><span class="op">)</span>
-  <span class="co"># look for problem sequences</span>
-  <span class="va">probSeqs</span> <span class="op">&lt;-</span> <span class="va">ZymoTrainingSet</span><span class="op">$</span><span class="va">problemSequences</span><span class="op">$</span><span class="va">Index</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"No problem sequences remaining.\n"</span><span class="op">)</span>
-    <span class="kw">break</span>
-  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">)</span> <span class="op">&amp;&amp;</span>
-             <span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">==</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Iterations converged.\n"</span><span class="op">)</span>
-    <span class="kw">break</span>
-  <span class="op">}</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span><span class="op">==</span><span class="va">maxIterations</span><span class="op">)</span>
-    <span class="kw">break</span>
-  <span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="va">probSeqs</span>
-  <span class="co"># remove any problem sequences</span>
-  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">remove</span><span class="op">)</span><span class="op">[</span><span class="va">probSeqs</span><span class="op">]</span>
-  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># remove all problem sequences</span>
-  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">allowGroupRemoval</span><span class="op">)</span> <span class="op">{</span>
-    <span class="co"># replace any removed groups</span>
-    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">(</span><span class="va">u_groups</span> <span class="op">%in%</span> <span class="va">groups</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span><span class="op">)</span>
-    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="va">u_groups</span><span class="op">[</span><span class="va">missing</span><span class="op">]</span>
-    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">missing</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span>
-      <span class="va">index</span> <span class="op">&lt;-</span> <span class="va">index</span><span class="op">[</span><span class="va">groups</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">%in%</span> <span class="va">missing</span><span class="op">]</span>
-      <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># don't remove</span>
-    <span class="op">}</span>
-  <span class="op">}</span>
-<span class="op">}</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">maxIterations</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
+<span><span class="va">allowGroupRemoval</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span></span>
+<span><span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">integer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">groupCounts</span> <span class="op">&gt;</span> <span class="va">maxGroupSize</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">groups</span><span class="op">==</span><span class="va">u_groups</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">index</span><span class="op">)</span>,</span>
+<span>                 <span class="va">maxGroupSize</span><span class="op">)</span></span>
+<span>  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">[</span><span class="op">-</span><span class="va">keep</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">taxid</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">maxIterations</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Training iteration: "</span>, <span class="va">i</span>, <span class="st">"\n"</span>, sep<span class="op">=</span><span class="st">""</span><span class="op">)</span></span>
+<span>  <span class="co"># train the classifier</span></span>
+<span>  <span class="va">ZymoTrainingSet</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DECIPHER/man/LearnTaxa.html" class="external-link">LearnTaxa</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,</span>
+<span>                           <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">seqs</span><span class="op">)</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span>,</span>
+<span>                           <span class="va">taxid</span><span class="op">)</span></span>
+<span>  <span class="co"># look for problem sequences</span></span>
+<span>  <span class="va">probSeqs</span> <span class="op">&lt;-</span> <span class="va">ZymoTrainingSet</span><span class="op">$</span><span class="va">problemSequences</span><span class="op">$</span><span class="va">Index</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No problem sequences remaining.\n"</span><span class="op">)</span></span>
+<span>    <span class="kw">break</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">==</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span>
+<span>             <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">probSeqsPrev</span><span class="op">==</span><span class="va">probSeqs</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Iterations converged.\n"</span><span class="op">)</span></span>
+<span>    <span class="kw">break</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span><span class="op">==</span><span class="va">maxIterations</span><span class="op">)</span></span>
+<span>    <span class="kw">break</span></span>
+<span>  <span class="va">probSeqsPrev</span> <span class="op">&lt;-</span> <span class="va">probSeqs</span></span>
+<span>  <span class="co"># remove any problem sequences</span></span>
+<span>  <span class="va">index</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">!</span><span class="va">remove</span><span class="op">)</span><span class="op">[</span><span class="va">probSeqs</span><span class="op">]</span></span>
+<span>  <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># remove all problem sequences</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="va">allowGroupRemoval</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># replace any removed groups</span></span>
+<span>    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="op">(</span><span class="va">u_groups</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">groups</span><span class="op">[</span><span class="op">!</span><span class="va">remove</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="va">missing</span> <span class="op">&lt;-</span> <span class="va">u_groups</span><span class="op">[</span><span class="va">missing</span><span class="op">]</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">missing</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">index</span> <span class="op">&lt;-</span> <span class="va">index</span><span class="op">[</span><span class="va">groups</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">missing</span><span class="op">]</span></span>
+<span>      <span class="va">remove</span><span class="op">[</span><span class="va">index</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">FALSE</span> <span class="co"># don't remove</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>Check any problems. We do not have it in this example.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">remove</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">probSeqs</span><span class="op">)</span></span></code></pre></div>
 <p>Check training set.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">ZymoTrainingSet</span>
-<span class="co"># for internal</span>
-<span class="co">#usethis::use_data(ZymoTrainingSet, overwrite = TRUE, compress = "xz")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">ZymoTrainingSet</span></span>
+<span><span class="co"># for internal</span></span>
+<span><span class="co">#usethis::use_data(ZymoTrainingSet, overwrite = TRUE, compress = "xz")</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">ZymoTrainingSet</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ZymoTrainingSet</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sessioninfo/man/session_info.html">session_info</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://r-lib.github.io/sessioninfo/reference/session_info.html" class="external-link">session_info</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
   </div>
 
@@ -209,11 +209,13 @@ These are from the <a href="https://www.bioconductor.org/packages/release/bioc/v
 
 
       <footer><div class="copyright">
-  <p>Developed by Sudarshan Shetty.</p>
+  <p></p>
+<p>Developed by Sudarshan Shetty.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
       </footer>
@@ -221,6 +223,8 @@ These are from the <a href="https://www.bioconductor.org/packages/release/bioc/v
 
   
 
+
+  
 
   </body>
 </html>
