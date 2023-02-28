@@ -101,6 +101,14 @@ p
 The above plot demonstrates how well/bad the experimental mocks behaved compared to theoretical composition.  
 The data from Karstens L, et al., 2019. [mSystems](https://doi.org/10.1128/mSystems.00290-19) started from cells->DNA extraction->pcr amplification->sequencing. At every step there is a possibility for bias. This is demonstrated by differences between the undiluted mock sample and Zymo theoretical composition. Additionally, diluted samples have several unknown, potential contaminants common to low-biomass samples.    
 
+The table one in this article provides the percent contaminants for each dilution. These values were D0 = 0.1, D1 = 0.1, D2 = 1.8, D3 = 4.5, D4 = 12.0, D5 = 27.9, D6 = 64.5, D7 = 55.8, D8 = 80.1.  
+We can check output of `checkZymoBiomics` for ASVs marked as 'Unknown' that are not matching any of the mock community taxa.  
+
+```{r}
+round(otu_table(output.dat$ps_species)["Unknown",],1)
+```
+
+
 Check how individual taxa were measured.  
 ```{r fig.width=6, fig.height=5}
 
@@ -110,7 +118,10 @@ p <- plotZymoDefault(output.dat)
 p[[1]] + facet_wrap(~FeatureID) + 
   theme_minimal(base_size = 10) + 
   theme(legend.position = "none",
-        strip.text = element_text(face="italic"))
+        strip.text = element_text(face="italic")) +
+  ggplot2::scale_y_discrete(limits = rev(c("ZymoTheoretical","D8", "D6", "D7", 
+                                       "D5", "D4", "D3", "D2", "D1", "D0")))
+
 ```
 
 Looking at individual strain abundances indicates under counting of _Staphylococcus aureus_. It is also important to note the limitations of species level assignments for short-read length ASVs.  
@@ -120,11 +131,14 @@ Check for their contribution.
 ```{r fig.width=6, fig.height=4}
 sp.df <- phyloseq::psmelt(ps_species) %>%
   dplyr::filter(Species=="Unknown" & Sample !="ZymoTheoretical")
+# we keep the order of dilution of samples 
+sp.df$Sample <- factor(sp.df$Sample, levels = c("D8", "D6", "D7", "D5", 
+                                                "D4", "D3", "D2", "D1", "D0"))
 
 ggplot(sp.df, aes(Sample, Abundance)) + 
   geom_col() + theme_minimal() +
   ggplot2::ylab("Non-Zymo Abundance (%)")+
-      ggplot2::xlab("Samples")
+      ggplot2::xlab("Samples") 
 
 ```
 The lowest dilution, D8 has 80% non-ZymoBiomics taxa, so make sure you have negative controls and check the article by Karstens L, et al. [Controlling for contaminants in low-biomass 16S rRNA gene sequencing experiments](https://doi.org/10.1128/mSystems.00290-19). mSystems 4:e00290-19. All codes from their analysis are available openly.   
